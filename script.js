@@ -1,7 +1,11 @@
-function goParent() {
-  alert("الانتقال إلى صفحة ولي الأمر");
+function goParent(){
+
+alert("الانتقال إلى صفحة تسجيل دخول ولي الأمر")
+
 }
 
-function goChild() {
-  alert("الانتقال إلى صفحة الطفل");
+function goChild(){
+
+alert("الانتقال إلى صفحة تسجيل دخول الطفل")
+
 }
