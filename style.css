@@ -1,99 +1,187 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Tahoma,Arial;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Tahoma", Arial, sans-serif;
 }
 
-body{
-background:#EEF1F7;
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px;
+:root {
+  --bg-main: #e9edf5;
+  --card-bg: #f8f9fc;
+  --navy: #556d97;
+  --navy-dark: #3f567f;
+  --blue-soft: #b9c6db;
+  --pink-soft: #d9b1bc;
+  --text-dark: #2f3443;
+  --text-muted: #6d7485;
+  --border-soft: #d8dee9;
+  --shadow: 0 12px 30px rgba(60, 80, 120, 0.12);
 }
 
-.container{
-width:100%;
-max-width:900px;
-background:white;
-border-radius:30px;
-padding:40px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
+body {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #e8edf5 0%, #dde5f0 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 28px;
 }
 
-.welcome-section{
-text-align:center;
-margin-bottom:40px;
+.page-shell {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-/* الشعار */
-
-.logo{
-width:220px;
-margin-bottom:30px;
+.main-card {
+  width: 100%;
+  max-width: 940px;
+  background: rgba(248, 249, 252, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(85, 109, 151, 0.12);
+  border-radius: 32px;
+  box-shadow: var(--shadow);
+  padding: 48px 40px;
 }
 
-.welcome-title{
-font-size:36px;
-margin-bottom:15px;
-color:#2F3443;
-font-weight:bold;
+.welcome-section {
+  text-align: center;
+  margin-bottom: 42px;
 }
 
-.welcome-text{
-font-size:20px;
-color:#555;
-line-height:1.8;
+.logo {
+  width: 220px;
+  max-width: 80%;
+  height: auto;
+  margin-bottom: 26px;
 }
 
-.user-heading{
-text-align:center;
-font-size:26px;
-color:#566F98;
-margin-bottom:25px;
-font-weight:bold;
+.welcome-title {
+  color: var(--text-dark);
+  font-size: 42px;
+  line-height: 1.4;
+  margin-bottom: 14px;
+  font-weight: 800;
 }
 
-.role-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
+.welcome-text {
+  color: var(--text-muted);
+  font-size: 21px;
+  line-height: 1.9;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.role-card{
-background:#F8F9FC;
-border-radius:18px;
-padding:20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;
-border:2px solid transparent;
-transition:0.2s;
+.user-section {
+  margin-top: 12px;
 }
 
-.role-card:hover{
-transform:translateY(-3px);
-border-color:#566F98;
+.user-heading {
+  text-align: center;
+  color: var(--navy-dark);
+  font-size: 28px;
+  margin-bottom: 24px;
+  font-weight: 800;
 }
 
-.role-text h3{
-font-size:20px;
-margin-bottom:5px;
-color:#2F3443;
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
 }
 
-.role-text p{
-font-size:14px;
-color:#777;
+.role-card {
+  border: none;
+  width: 100%;
+  text-align: right;
+  background: #ffffff;
+  border: 2px solid transparent;
+  border-radius: 24px;
+  padding: 26px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 8px 18px rgba(85, 109, 151, 0.08);
 }
 
-.icon{
-font-size:35px;
+.role-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--blue-soft);
+  box-shadow: 0 14px 26px rgba(85, 109, 151, 0.14);
 }
 
-.icon{
-font-size:35px;
+.role-card.parent {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f4fa 100%);
+}
+
+.role-card.child {
+  background: linear-gradient(135deg, #ffffff 0%, #f9f1f4 100%);
+}
+
+.role-text h3 {
+  color: var(--navy-dark);
+  font-size: 24px;
+  margin-bottom: 8px;
+  font-weight: 800;
+}
+
+.role-text p {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.role-icon {
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 34px;
+  flex-shrink: 0;
+  margin-right: 18px;
+}
+
+.parent .role-icon {
+  background: #eef3fb;
+}
+
+.child .role-icon {
+  background: #f7edf0;
+}
+
+@media (max-width: 768px) {
+  .main-card {
+    padding: 34px 20px;
+    border-radius: 24px;
+  }
+
+  .welcome-title {
+    font-size: 30px;
+  }
+
+  .welcome-text {
+    font-size: 17px;
+  }
+
+  .user-heading {
+    font-size: 24px;
+  }
+
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-text h3 {
+    font-size: 21px;
+  }
+
+  .role-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 30px;
+  }
 }
