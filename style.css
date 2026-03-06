@@ -273,8 +273,13 @@ body{
 }
 
 .top-logo{
-  max-width:150px;
-  margin:0;
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:white;
+  padding:12px;
+  object-fit:contain;
+  box-shadow:0 10px 25px rgba(0,0,0,0.12);
 }
 
 .logout-btn{
