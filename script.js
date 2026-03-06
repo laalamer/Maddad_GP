@@ -1,27 +1,27 @@
-function goParent(){
+function goParent() {
   window.location.href = "parent.html";
 }
 
-function goChild(){
+function goChild() {
   window.location.href = "child.html";
 }
 
-function showSignup(){
+function showSignup() {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("signupBox").style.display = "block";
 }
 
-function showLogin(){
+function showLogin() {
   document.getElementById("signupBox").style.display = "none";
   document.getElementById("loginBox").style.display = "block";
 }
 
-function parentSignup(){
+function parentSignup() {
   const childName = document.getElementById("signupChildName").value.trim();
   const email = document.getElementById("signupEmail").value.trim();
   const password = document.getElementById("signupPassword").value.trim();
 
-  if(!childName || !email || !password){
+  if (!childName || !email || !password) {
     alert("فضلاً عبئي جميع الحقول");
     return;
   }
@@ -38,23 +38,23 @@ function parentSignup(){
   window.location.href = "home.html";
 }
 
-function parentLogin(){
+function parentLogin() {
   const email = document.getElementById("parentLoginEmail").value.trim();
   const password = document.getElementById("parentLoginPassword").value.trim();
 
   const savedAccount = JSON.parse(localStorage.getItem("maddadAccount"));
 
-  if(!email || !password){
+  if (!email || !password) {
     alert("فضلاً أدخلي البريد الإلكتروني وكلمة المرور");
     return;
   }
 
-  if(!savedAccount){
+  if (!savedAccount) {
     alert("لا يوجد حساب محفوظ حالياً. أنشئي حساب أولاً");
     return;
   }
 
-  if(email === savedAccount.email && password === savedAccount.password){
+  if (email === savedAccount.email && password === savedAccount.password) {
     localStorage.setItem("maddadLoggedIn", "true");
     window.location.href = "home.html";
   } else {
@@ -62,23 +62,23 @@ function parentLogin(){
   }
 }
 
-function childLogin(){
+function childLogin() {
   const email = document.getElementById("childLoginEmail").value.trim();
   const password = document.getElementById("childLoginPassword").value.trim();
 
   const savedAccount = JSON.parse(localStorage.getItem("maddadAccount"));
 
-  if(!email || !password){
+  if (!email || !password) {
     alert("فضلاً أدخل البريد الإلكتروني وكلمة المرور");
     return;
   }
 
-  if(!savedAccount){
+  if (!savedAccount) {
     alert("لا يوجد حساب محفوظ حالياً");
     return;
   }
 
-  if(email === savedAccount.email && password === savedAccount.password){
+  if (email === savedAccount.email && password === savedAccount.password) {
     alert("تم تسجيل الدخول بنجاح. لاحقًا بنربطها بصفحة الألعاب");
     // لاحقًا:
     // window.location.href = "games.html";
@@ -87,29 +87,39 @@ function childLogin(){
   }
 }
 
-function loadHomePage(){
+function loadHomePage() {
   const loggedIn = localStorage.getItem("maddadLoggedIn");
   const savedAccount = JSON.parse(localStorage.getItem("maddadAccount"));
 
-  if(loggedIn !== "true" || !savedAccount){
+  if (loggedIn !== "true" || !savedAccount) {
     window.location.href = "parent.html";
     return;
   }
 
-  document.getElementById("welcomeMessage").textContent =
-    "أهلًا ولي أمر " + savedAccount.childName;
+  const welcomeMessage = document.getElementById("welcomeMessage");
+  const childNameText = document.getElementById("childNameText");
+  const emailText = document.getElementById("emailText");
 
-  document.getElementById("childNameText").textContent = savedAccount.childName;
-  document.getElementById("emailText").textContent = savedAccount.email;
+  if (welcomeMessage) {
+    welcomeMessage.textContent = "أهلًا ولي أمر " + savedAccount.childName;
+  }
+
+  if (childNameText) {
+    childNameText.textContent = savedAccount.childName;
+  }
+
+  if (emailText) {
+    emailText.textContent = savedAccount.email;
+  }
 }
 
-function logout(){
+function logout() {
   localStorage.removeItem("maddadLoggedIn");
   window.location.href = "index.html";
 }
 
-function startQuestionnaire(){
-  alert("هنا لاحقًا بنربط صفحة الاستبيان");
+function startQuestionnaire() {
+  window.location.href = "questionnaire.html";
 }
 
 /* =========================
@@ -118,10 +128,6 @@ function startQuestionnaire(){
 
 function goBackHome() {
   window.location.href = "home.html";
-}
-
-function getStoredUser() {
-  return JSON.parse(localStorage.getItem("maddadCurrentUser")) || null;
 }
 
 function getAssessment() {
@@ -200,40 +206,8 @@ function riskTextArabic(risk) {
   return "مرتفعة";
 }
 
-function riskTitleArabic(risk) {
-  if (risk === "low") return "خطورة منخفضة";
-  if (risk === "medium") return "خطورة متوسطة";
-  return "خطورة مرتفعة";
-}
-
 function getFailedSkills(answersObj) {
   return skillKeys.filter(key => Number(answersObj[key]) === 1);
-}
-
-/* =========================
-   HOME PAGE
-========================= */
-
-function loadHomePage() {
-  const currentUser = getStoredUser();
-
-  if (!currentUser) {
-    window.location.href = "parent-login.html";
-    return;
-  }
-
-  const childNameText = document.getElementById("childNameText");
-  const emailText = document.getElementById("emailText");
-  const welcomeMessage = document.getElementById("welcomeMessage");
-
-  if (childNameText) childNameText.textContent = currentUser.childName || "---";
-  if (emailText) emailText.textContent = currentUser.email || "---";
-  if (welcomeMessage) welcomeMessage.textContent = `أهلًا ولي أمر ${currentUser.childName || "الطفل"}`;
-}
-
-function logout() {
-  localStorage.removeItem("maddadCurrentUser");
-  window.location.href = "index.html";
 }
 
 /* =========================
@@ -241,9 +215,11 @@ function logout() {
 ========================= */
 
 function loadQuestionnairePage() {
-  const currentUser = getStoredUser();
-  if (!currentUser) {
-    window.location.href = "parent-login.html";
+  const loggedIn = localStorage.getItem("maddadLoggedIn");
+  const savedAccount = JSON.parse(localStorage.getItem("maddadAccount"));
+
+  if (loggedIn !== "true" || !savedAccount) {
+    window.location.href = "parent.html";
   }
 }
 
@@ -251,13 +227,13 @@ function submitQuestionnaire(event) {
   event.preventDefault();
 
   const error = document.getElementById("questionnaireError");
-  error.textContent = "";
+  if (error) error.textContent = "";
 
   const ageGroup = document.querySelector('input[name="ageGroup"]:checked');
   const gender = document.querySelector('input[name="gender"]:checked');
 
   if (!ageGroup || !gender) {
-    error.textContent = "يرجى اختيار عمر الطفل وجنسه أولًا.";
+    if (error) error.textContent = "يرجى اختيار عمر الطفل وجنسه أولًا.";
     return;
   }
 
@@ -266,7 +242,7 @@ function submitQuestionnaire(event) {
   for (let key of skillKeys) {
     const selected = document.querySelector(`input[name="${key}"]:checked`);
     if (!selected) {
-      error.textContent = "يرجى الإجابة على جميع الأسئلة.";
+      if (error) error.textContent = "يرجى الإجابة على جميع الأسئلة.";
       return;
     }
     answers[key] = Number(selected.value); // نعم=0 / لا=1
@@ -476,7 +452,7 @@ function submitFollowup(event) {
 
   const assessment = getAssessment();
   const error = document.getElementById("followupError");
-  error.textContent = "";
+  if (error) error.textContent = "";
 
   if (!assessment) {
     window.location.href = "questionnaire.html";
@@ -485,7 +461,6 @@ function submitFollowup(event) {
 
   const updatedAnswers = { ...assessment.currentAnswers };
 
-  /* ===== Eye Contact ===== */
   if (assessment.failedSkills.includes("eye_contact")) {
     const eyeChecks = document.querySelectorAll('input[name="eye_contact_context"]:checked');
     const eyeCount = eyeChecks.length;
@@ -497,24 +472,22 @@ function submitFollowup(event) {
     } else if (eyeCount === 1) {
       const eyeSub = document.querySelector('input[name="eye_contact_sub"]:checked');
       if (!eyeSub) {
-        error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالتواصل البصري.";
+        if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالتواصل البصري.";
         return;
       }
       updatedAnswers.eye_contact = eyeSub.value === "yes" ? 0 : 1;
     }
   }
 
-  /* ===== Response to Name ===== */
   if (assessment.failedSkills.includes("response_to_name")) {
     const nameFollow = document.querySelector('input[name="response_to_name_followup"]:checked');
     if (!nameFollow) {
-      error.textContent = "يرجى الإجابة على سؤال متابعة الاستجابة للاسم.";
+      if (error) error.textContent = "يرجى الإجابة على سؤال متابعة الاستجابة للاسم.";
       return;
     }
     updatedAnswers.response_to_name = nameFollow.value === "yes" ? 0 : 1;
   }
 
-  /* ===== Pointing with Finger ===== */
   if (assessment.failedSkills.includes("pointing_with_finger")) {
     const pointChecks = document.querySelectorAll('input[name="pointing_context"]:checked');
     const pointCount = pointChecks.length;
@@ -526,7 +499,7 @@ function submitFollowup(event) {
     } else if (pointCount === 1) {
       const pointSub = document.querySelector('input[name="pointing_sub"]:checked');
       if (!pointSub) {
-        error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالإشارة بالإصبع.";
+        if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالإشارة بالإصبع.";
         return;
       }
       updatedAnswers.pointing_with_finger = pointSub.value === "yes" ? 0 : 1;
