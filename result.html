@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مدد | النتيجة</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-main" onload="loadResultPage()">
+  <div class="bg-blur bg-blur-top"></div>
+  <div class="bg-blur bg-blur-bottom"></div>
+
+  <div class="result-page">
+    <div class="top-bar simple-top">
+      <button class="back-btn" onclick="goBackHome()">الرئيسية</button>
+      <img src="logo.png" class="logo top-logo centered-logo" alt="شعار مدد" />
+      <div class="top-space"></div>
+    </div>
+
+    <div class="result-card">
+      <div id="resultBadge" class="result-badge">نتيجة التقييم</div>
+      <h1 id="resultTitle" class="result-title">---</h1>
+      <p id="resultText" class="result-text">---</p>
+
+      <div class="result-summary" id="resultSummary"></div>
+
+      <div class="home-actions">
+        <button id="resultMainBtn" class="main-btn big-btn" onclick="handleResultMainAction()">
+          متابعة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
