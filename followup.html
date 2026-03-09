@@ -130,9 +130,9 @@
   </div>
   <script src="script.js"></script>
   <script>
-    const rawAnswers = JSON.parse(localStorage.getItem("maddad_answers") || "{}");
-    const needsImitation      = rawAnswers.imitation === "1";
-    const needsDiscrimination = rawAnswers.discrimination === "1";
+    const rawAnswers      = JSON.parse(localStorage.getItem("maddad_answers") || "{}");
+    const needsImitation  = rawAnswers.imitation === "1";
+    const needsDiscrim    = rawAnswers.discrimination === "1";
 
     const imitationHTML = `
       <div class="question-block first-question-block">
@@ -187,6 +187,8 @@
       </div>`;
 
     // ── Override loadFollowupPage ────────────────────────────────────────────
+    // Skips the original's "low risk → redirect" guard, renders other skill
+    // sections (eye_contact etc.) if needed, then appends our sections.
     const _originalLoad = loadFollowupPage;
     loadFollowupPage = function () {
       const assessment = getAssessment();
@@ -194,55 +196,95 @@
 
       const container = document.getElementById("followupContainer");
 
-      // Only call the original if initialRisk is medium/high
-      // (original immediately redirects to result.html for "low", which would
-      //  skip imitation/discrimination follow-ups that can still correct the score)
+      // Only invoke original (eye_contact / response_to_name / pointing sections)
+      // when initialRisk is NOT low — the original would redirect to result for low
       if (assessment.initialRisk !== "low") {
         _originalLoad();
       }
 
-      // Append our sections regardless of initialRisk
-      if (needsImitation)      container.innerHTML += imitationHTML;
-      if (needsDiscrimination) container.innerHTML += discriminationHTML;
+      if (needsImitation) container.innerHTML += imitationHTML;
+      if (needsDiscrim)   container.innerHTML += discriminationHTML;
     };
 
-    // ── Override submitFollowup ──────────────────────────────────────────────
-    const _originalSubmit = submitFollowup;
+    // ── Override submitFollowup completely ──────────────────────────────────
+    // We handle ALL skills here so there is no double-calculation from _originalSubmit
     submitFollowup = function (event) {
       event.preventDefault();
 
       const assessment = getAssessment();
+      const error = document.getElementById("followupError");
+      if (error) error.textContent = "";
       if (!assessment) { window.location.href = "questionnaire.html"; return; }
 
-      // Score imitation: 2+ checked = pass (0), else fail (1)
+      const updatedAnswers = { ...assessment.currentAnswers };
+
+      // ── imitation ──────────────────────────────────────────────────────────
       if (needsImitation) {
         const checked = document.querySelectorAll('input[name="imitation_checks"]:checked').length;
-        assessment.currentAnswers.imitation = checked >= 2 ? 0 : 1;
+        updatedAnswers.imitation = checked >= 2 ? 0 : 1;
       }
 
-      // Score discrimination: 2+ checked = pass (0), else fail (1)
-      if (needsDiscrimination) {
+      // ── discrimination ─────────────────────────────────────────────────────
+      if (needsDiscrim) {
         const checked = document.querySelectorAll('input[name="discrimination_checks"]:checked').length;
-        assessment.currentAnswers.discrimination = checked >= 2 ? 0 : 1;
+        updatedAnswers.discrimination = checked >= 2 ? 0 : 1;
       }
 
-      // Recalculate final score and risk with updated answers
-      // (this allows risk to go DOWN to low if follow-ups improve the score)
-      const finalScore = calculateScore(assessment.currentAnswers);
+      // ── eye_contact (from original script.js logic) ────────────────────────
+      if (assessment.failedSkills.includes("eye_contact")) {
+        const eyeCount = document.querySelectorAll('input[name="eye_contact_context"]:checked').length;
+        if (eyeCount === 0) {
+          updatedAnswers.eye_contact = 1;
+        } else if (eyeCount >= 2) {
+          updatedAnswers.eye_contact = 0;
+        } else {
+          const eyeSub = document.querySelector('input[name="eye_contact_sub"]:checked');
+          if (!eyeSub) {
+            if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالتواصل البصري.";
+            return;
+          }
+          updatedAnswers.eye_contact = eyeSub.value === "yes" ? 0 : 1;
+        }
+      }
+
+      // ── response_to_name (from original script.js logic) ──────────────────
+      if (assessment.failedSkills.includes("response_to_name")) {
+        const nameFollow = document.querySelector('input[name="response_to_name_followup"]:checked');
+        if (!nameFollow) {
+          if (error) error.textContent = "يرجى الإجابة على سؤال متابعة الاستجابة للاسم.";
+          return;
+        }
+        updatedAnswers.response_to_name = nameFollow.value === "yes" ? 0 : 1;
+      }
+
+      // ── pointing_with_finger (from original script.js logic) ──────────────
+      if (assessment.failedSkills.includes("pointing_with_finger")) {
+        const pointCount = document.querySelectorAll('input[name="pointing_context"]:checked').length;
+        if (pointCount === 0) {
+          updatedAnswers.pointing_with_finger = 1;
+        } else if (pointCount >= 2) {
+          updatedAnswers.pointing_with_finger = 0;
+        } else {
+          const pointSub = document.querySelector('input[name="pointing_sub"]:checked');
+          if (!pointSub) {
+            if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالإشارة بالإصبع.";
+            return;
+          }
+          updatedAnswers.pointing_with_finger = pointSub.value === "yes" ? 0 : 1;
+        }
+      }
+
+      // ── Final calculation ──────────────────────────────────────────────────
+      const finalScore = calculateScore(updatedAnswers);
       const finalRisk  = classifyRisk(assessment.ageGroup, finalScore);
+
+      assessment.currentAnswers  = updatedAnswers;
       assessment.finalScore      = finalScore;
       assessment.finalRisk       = finalRisk;
       assessment.followupComplete = true;
-      saveAssessment(assessment);
 
-      // If initialRisk was medium/high, let the original handle the other skills
-      // (eye_contact, response_to_name, pointing) before redirecting
-      if (assessment.initialRisk !== "low") {
-        _originalSubmit(event);
-      } else {
-        // initialRisk was low — no other skills to process, go straight to result
-        window.location.href = "result.html";
-      }
+      saveAssessment(assessment);
+      window.location.href = "result.html";
     };
   </script>
 </body>
