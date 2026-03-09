@@ -23,7 +23,7 @@
         أجيبي عن الأسئلة التالية بدقة لمساعدتنا في إعطاء تقييم أولي.
       </p>
 
-      <form id="questionnaireForm" onsubmit="checkFollowUp(event)">
+      <form id="questionnaireForm" onsubmit="submitQuestionnaire(event)">
         <!-- العمر -->
         <div class="question-block first-question-block">
           <label class="question-label">كم عمر طفلك؟</label>
@@ -161,67 +161,5 @@
   </div>
 
   <script src="script.js"></script>
-  <script>
-    function checkFollowUp(event) {
-      event.preventDefault();
-      const form = document.getElementById("questionnaireForm");
-      const errorEl = document.getElementById("questionnaireError");
-      errorEl.textContent = "";
-
-      const fields = [
-        "ageGroup", "gender",
-        "response_to_name", "eye_contact", "social_smile", "imitation",
-        "discrimination", "pointing_with_finger", "facial_expressions",
-        "joint_attention", "play_skills", "response_to_commands"
-      ];
-
-      for (const name of fields) {
-        if (!form.querySelector(`input[name="${name}"]:checked`)) {
-          errorEl.textContent = "يرجى الإجابة على جميع الأسئلة.";
-          return;
-        }
-      }
-
-      // collect raw string values (needed by followup.html to decide which sections to show)
-      const rawAnswers = {};
-      for (const name of fields) {
-        rawAnswers[name] = form.querySelector(`input[name="${name}"]:checked`).value;
-      }
-      localStorage.setItem("maddad_answers", JSON.stringify(rawAnswers));
-
-      // build numeric answers for score calculation (same as submitQuestionnaire in script.js)
-      const answersNum = {};
-      for (const key of skillKeys) {
-        answersNum[key] = Number(rawAnswers[key]);
-      }
-
-      const score        = calculateScore(answersNum);
-      const initialRisk  = classifyRisk(rawAnswers.ageGroup, score);
-      const failedSkills = getFailedSkills(answersNum);
-
-      // save full assessment so script.js functions (loadResultPage, submitFollowup…) work correctly
-      const assessment = {
-        ageGroup:        rawAnswers.ageGroup,
-        gender:          rawAnswers.gender,
-        initialAnswers:  answersNum,
-        currentAnswers:  { ...answersNum },
-        initialScore:    score,
-        initialRisk:     initialRisk,
-        failedSkills:    failedSkills,
-        followupNeeded:  (initialRisk === "medium" || initialRisk === "high"),
-        followupComplete: false,
-        finalScore:      score,
-        finalRisk:       initialRisk
-      };
-      saveAssessment(assessment);
-
-      // route: imitation or discrimination answered لا → followup first
-      if (rawAnswers.imitation === "1" || rawAnswers.discrimination === "1") {
-        window.location.href = "followup.html";
-      } else {
-        window.location.href = "result.html";
-      }
-    }
-  </script>
 </body>
 </html>
