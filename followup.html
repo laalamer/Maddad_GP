@@ -5,6 +5,107 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>مدد | أسئلة المتابعة</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .followup-section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+      text-align: right;
+    }
+
+    .followup-section-subtitle {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 14px;
+      text-align: right;
+    }
+
+    .followup-check-item {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      gap: 12px;
+    }
+
+    .followup-check-item:hover {
+      border-color: #a0b4f0;
+      background: #f7f9ff;
+    }
+
+    .followup-check-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      accent-color: #4a6cf7;
+      cursor: pointer;
+    }
+
+    .followup-check-item span {
+      flex: 1;
+      font-size: 0.95rem;
+      color: #222;
+      text-align: right;
+    }
+
+    .followup-subquestion {
+      background: #f5f7ff;
+      border: 1px solid #dce3ff;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 14px;
+    }
+
+    .followup-subquestion-text {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .followup-yn {
+      display: flex;
+      flex-direction: row-reverse;
+      gap: 12px;
+    }
+
+    .followup-yn label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1.5px solid #c8d0f0;
+      border-radius: 8px;
+      padding: 8px 22px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .followup-yn label:hover {
+      border-color: #4a6cf7;
+      background: #f0f4ff;
+    }
+
+    .followup-yn input[type="radio"] {
+      accent-color: #4a6cf7;
+      width: 16px;
+      height: 16px;
+    }
+  </style>
 </head>
 <body class="bg-main" onload="loadFollowupPage()">
   <div class="bg-blur bg-blur-top"></div>
@@ -30,73 +131,82 @@
   <script src="script.js"></script>
   <script>
     const rawAnswers = JSON.parse(localStorage.getItem("maddad_answers") || "{}");
+    const needsImitation      = rawAnswers.imitation === "1";
+    const needsDiscrimination = rawAnswers.discrimination === "1";
 
     const imitationHTML = `
       <div class="question-block first-question-block">
-        <div class="question-title">4- التقليد</div>
-        <div class="question-text">حدّدي كل فعل تلاحظينه عند طفلك:</div>
-        <div class="followup-checks">
-          <label class="followup-check-item">
-            <input type="checkbox" name="imitation_checks" />
-            <span>يخرج لسانه</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="imitation_checks" />
-            <span>يصدر أصواتاً مضحكة</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="imitation_checks" />
-            <span>يلوح قاصداً "وداعاً" (أو يشير لـ "وداعاً")</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="imitation_checks" />
-            <span>يصفق بيده</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="imitation_checks" />
-            <span>يضع إصبعه على شفتيه كإشارة لـ "السكوت / الصمت"</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="imitation_checks" />
-            <span>يرسل قبلة في الهواء</span>
-          </label>
-        </div>
+        <div class="followup-section-title">متابعة: التقليد</div>
+        <div class="followup-section-subtitle">اختاري كل فعل تلاحظينه عند طفلك:</div>
+        <label class="followup-check-item">
+          <input type="checkbox" name="imitation_checks" />
+          <span>يخرج لسانه</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="imitation_checks" />
+          <span>يصدر أصواتاً مضحكة</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="imitation_checks" />
+          <span>يلوح قاصداً "وداعاً" (أو يشير لـ "وداعاً")</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="imitation_checks" />
+          <span>يصفق بيده</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="imitation_checks" />
+          <span>يضع إصبعه على شفتيه كإشارة لـ "السكوت / الصمت"</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="imitation_checks" />
+          <span>يرسل قبلة في الهواء</span>
+        </label>
       </div>`;
 
     const discriminationHTML = `
       <div class="question-block">
-        <div class="question-title">5- التمييز</div>
-        <div class="question-text">حدّدي كل فعل تلاحظينه عند طفلك:</div>
-        <div class="followup-checks">
-          <label class="followup-check-item">
-            <input type="checkbox" name="discrimination_checks" />
-            <span>يتعرّف على جزء من جسمه عند سؤاله "أين أنفك؟" أو "أين عينك؟"</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="discrimination_checks" />
-            <span>يلتفت أو ينظر إلى والد أو شقيق عند ذكر اسمه "أين ماما؟"</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="discrimination_checks" />
-            <span>يشير إلى غرض مألوف ويومي (مثل كرسي أو مصباح) عند سؤاله "أين الكرسي؟"</span>
-          </label>
-          <label class="followup-check-item">
-            <input type="checkbox" name="discrimination_checks" />
-            <span>يحضر غرضاً مألوفاً ويومياً (مثل ملعقة أو بطانية) عند طلبه "أحضر الملعقة"</span>
-          </label>
-        </div>
+        <div class="followup-section-title">متابعة: التمييز</div>
+        <div class="followup-section-subtitle">اختاري كل فعل تلاحظينه عند طفلك:</div>
+        <label class="followup-check-item">
+          <input type="checkbox" name="discrimination_checks" />
+          <span>يتعرّف على جزء من جسمه عند سؤاله "أين أنفك؟" أو "أين عينك؟"</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="discrimination_checks" />
+          <span>يلتفت أو ينظر إلى والد أو شقيق عند ذكر اسمه "أين ماما؟"</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="discrimination_checks" />
+          <span>يشير إلى غرض مألوف ويومي (مثل كرسي أو مصباح) عند سؤاله "أين الكرسي؟"</span>
+        </label>
+        <label class="followup-check-item">
+          <input type="checkbox" name="discrimination_checks" />
+          <span>يحضر غرضاً مألوفاً ويومياً (مثل ملعقة أو بطانية) عند طلبه "أحضر الملعقة"</span>
+        </label>
       </div>`;
 
-    // ── Override loadFollowupPage to also append imitation/discrimination ──
+    // ── Override loadFollowupPage ────────────────────────────────────────────
     const _originalLoad = loadFollowupPage;
     loadFollowupPage = function () {
-      _originalLoad();  // runs script.js logic, sets container.innerHTML
+      const assessment = getAssessment();
+      if (!assessment) { window.location.href = "questionnaire.html"; return; }
+
       const container = document.getElementById("followupContainer");
-      if (rawAnswers.imitation === "1")      container.innerHTML += imitationHTML;
-      if (rawAnswers.discrimination === "1") container.innerHTML += discriminationHTML;
+
+      // Only call the original if initialRisk is medium/high
+      // (original immediately redirects to result.html for "low", which would
+      //  skip imitation/discrimination follow-ups that can still correct the score)
+      if (assessment.initialRisk !== "low") {
+        _originalLoad();
+      }
+
+      // Append our sections regardless of initialRisk
+      if (needsImitation)      container.innerHTML += imitationHTML;
+      if (needsDiscrimination) container.innerHTML += discriminationHTML;
     };
 
-    // ── Override submitFollowup to also score imitation/discrimination ──
+    // ── Override submitFollowup ──────────────────────────────────────────────
     const _originalSubmit = submitFollowup;
     submitFollowup = function (event) {
       event.preventDefault();
@@ -104,23 +214,35 @@
       const assessment = getAssessment();
       if (!assessment) { window.location.href = "questionnaire.html"; return; }
 
-      // score imitation follow-up
-      if (rawAnswers.imitation === "1") {
+      // Score imitation: 2+ checked = pass (0), else fail (1)
+      if (needsImitation) {
         const checked = document.querySelectorAll('input[name="imitation_checks"]:checked').length;
         assessment.currentAnswers.imitation = checked >= 2 ? 0 : 1;
       }
 
-      // score discrimination follow-up
-      if (rawAnswers.discrimination === "1") {
+      // Score discrimination: 2+ checked = pass (0), else fail (1)
+      if (needsDiscrimination) {
         const checked = document.querySelectorAll('input[name="discrimination_checks"]:checked').length;
         assessment.currentAnswers.discrimination = checked >= 2 ? 0 : 1;
       }
 
-      // persist updated answers so the original submitFollowup reads them
+      // Recalculate final score and risk with updated answers
+      // (this allows risk to go DOWN to low if follow-ups improve the score)
+      const finalScore = calculateScore(assessment.currentAnswers);
+      const finalRisk  = classifyRisk(assessment.ageGroup, finalScore);
+      assessment.finalScore      = finalScore;
+      assessment.finalRisk       = finalRisk;
+      assessment.followupComplete = true;
       saveAssessment(assessment);
 
-      // now let script.js handle the rest (other skills + final score + redirect)
-      _originalSubmit(event);
+      // If initialRisk was medium/high, let the original handle the other skills
+      // (eye_contact, response_to_name, pointing) before redirecting
+      if (assessment.initialRisk !== "low") {
+        _originalSubmit(event);
+      } else {
+        // initialRisk was low — no other skills to process, go straight to result
+        window.location.href = "result.html";
+      }
     };
   </script>
 </body>
