@@ -29,7 +29,7 @@
   </div>
   <script src="script.js"></script>
   <script>
-    const answers = JSON.parse(localStorage.getItem("maddad_answers") || "{}");
+    const rawAnswers = JSON.parse(localStorage.getItem("maddad_answers") || "{}");
 
     const imitationHTML = `
       <div class="question-block first-question-block">
@@ -87,9 +87,41 @@
         </div>
       </div>`;
 
-    const container = document.getElementById("followupContainer");
-    if (answers.imitation === "1")      container.innerHTML += imitationHTML;
-    if (answers.discrimination === "1") container.innerHTML += discriminationHTML;
+    // ── Override loadFollowupPage to also append imitation/discrimination ──
+    const _originalLoad = loadFollowupPage;
+    loadFollowupPage = function () {
+      _originalLoad();  // runs script.js logic, sets container.innerHTML
+      const container = document.getElementById("followupContainer");
+      if (rawAnswers.imitation === "1")      container.innerHTML += imitationHTML;
+      if (rawAnswers.discrimination === "1") container.innerHTML += discriminationHTML;
+    };
+
+    // ── Override submitFollowup to also score imitation/discrimination ──
+    const _originalSubmit = submitFollowup;
+    submitFollowup = function (event) {
+      event.preventDefault();
+
+      const assessment = getAssessment();
+      if (!assessment) { window.location.href = "questionnaire.html"; return; }
+
+      // score imitation follow-up
+      if (rawAnswers.imitation === "1") {
+        const checked = document.querySelectorAll('input[name="imitation_checks"]:checked').length;
+        assessment.currentAnswers.imitation = checked >= 2 ? 0 : 1;
+      }
+
+      // score discrimination follow-up
+      if (rawAnswers.discrimination === "1") {
+        const checked = document.querySelectorAll('input[name="discrimination_checks"]:checked').length;
+        assessment.currentAnswers.discrimination = checked >= 2 ? 0 : 1;
+      }
+
+      // persist updated answers so the original submitFollowup reads them
+      saveAssessment(assessment);
+
+      // now let script.js handle the rest (other skills + final score + redirect)
+      _originalSubmit(event);
+    };
   </script>
 </body>
 </html>
