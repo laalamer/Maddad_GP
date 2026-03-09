@@ -23,7 +23,7 @@
         أجيبي عن الأسئلة التالية بدقة لمساعدتنا في إعطاء تقييم أولي.
       </p>
 
-      <form id="questionnaireForm" onsubmit="submitQuestionnaire(event)">
+      <form id="questionnaireForm" onsubmit="checkFollowUp(event)">
         <!-- العمر -->
         <div class="question-block first-question-block">
           <label class="question-label">كم عمر طفلك؟</label>
@@ -161,5 +161,39 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function checkFollowUp(event) {
+      event.preventDefault();
+      const form = document.getElementById("questionnaireForm");
+      const errorEl = document.getElementById("questionnaireError");
+      errorEl.textContent = "";
+
+      const fields = [
+        "ageGroup", "gender",
+        "response_to_name", "eye_contact", "social_smile", "imitation",
+        "discrimination", "pointing_with_finger", "facial_expressions",
+        "joint_attention", "play_skills", "response_to_commands"
+      ];
+
+      for (const name of fields) {
+        if (!form.querySelector(`input[name="${name}"]:checked`)) {
+          errorEl.textContent = "يرجى الإجابة على جميع الأسئلة.";
+          return;
+        }
+      }
+
+      const answers = {};
+      for (const name of fields) {
+        answers[name] = form.querySelector(`input[name="${name}"]:checked`).value;
+      }
+      localStorage.setItem("maddad_answers", JSON.stringify(answers));
+
+      if (answers.imitation === "1" || answers.discrimination === "1") {
+        window.location.href = "followup.html";
+      } else {
+        submitQuestionnaire(event);
+      }
+    }
+  </script>
 </body>
 </html>
