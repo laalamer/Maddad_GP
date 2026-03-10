@@ -517,3 +517,43 @@ function submitFollowup(event) {
   saveAssessment(assessment);
   window.location.href = "result.html";
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const gamesContainer = document.getElementById("gamesContainer");
+  if (!gamesContainer) return;
+
+  const assessment = JSON.parse(localStorage.getItem("maddadAssessment"));
+  if (!assessment || !assessment.currentAnswers) return;
+
+  const answers = assessment.currentAnswers;
+
+  const responseGame = document.getElementById("responseGame");
+  const eyeContactGame = document.getElementById("eyeContactGame");
+
+  if (responseGame) responseGame.style.display = "none";
+  if (eyeContactGame) eyeContactGame.style.display = "none";
+
+  const hasWeakResponse = Number(answers.response_to_name) === 1;
+  const hasWeakEye = Number(answers.eye_contact) === 1;
+
+  if (hasWeakResponse && responseGame) {
+    responseGame.style.display = "flex";
+  }
+
+  if (hasWeakEye && eyeContactGame) {
+    eyeContactGame.style.display = "flex";
+  }
+
+  if (!hasWeakResponse && !hasWeakEye) {
+    gamesContainer.innerHTML = `
+      <div class="game-layout" style="justify-content:center;">
+        <div class="game-details" style="text-align:center;">
+          <div class="game-title">لا توجد أنشطة مقترحة حالياً</div>
+          <div class="game-description">
+            لم تظهر في نتيجة الطفل حاجة حالية لأنشطة خاصة بمهارتي التواصل البصري أو الاستجابة للاسم.
+          </div>
+        </div>
+      </div>
+    `;
+  }
+});
