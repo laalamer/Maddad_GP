@@ -21,12 +21,94 @@
         نحتاج بعض التفاصيل الإضافية لتحسين دقة النتيجة.
       </p>
       <form id="followupForm" onsubmit="submitFollowup(event)">
-        <div id="followupContainer"></div>
+        <div id="followupContainer">
+
+          <!-- ==================== التمييز ==================== -->
+          <div class="followup-section" id="section-discrimination">
+            <h2 class="followup-section-title">التمييز (Discrimination)</h2>
+            <p class="followup-section-desc">ضع علامة على كل فعل يقوم به الطفل:</p>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="discrimination" value="body_part" />
+              التعرّف على جزء من جسمه عندما تسأل "أين أنفك؟" أو "أين عينك؟"
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="discrimination" value="look_at_person" />
+              الالتفات أو النظر إلى والد أو شقيق عندما تذكر اسمهم "أين ماما؟"
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="discrimination" value="point_object" />
+              الإشارة إلى غرض مألوف ويومي (مثل كرسي أو مصباح) عندما تسأل "أين الكرسي؟"
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="discrimination" value="fetch_object" />
+              إحضار غرض مألوف ويومي (مثل ملعقة أو بطانية) عندما تطلب منهم "أحضر الملعقة"
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="discrimination" value="other_discrimination" id="discOtherCheck" onchange="toggleOtherInput('discOtherInput', this)" />
+              أخرى (اذكر):
+            </label>
+            <input type="text" id="discOtherInput" name="discrimination_other" class="form-input other-input" placeholder="اذكر هنا..." style="display:none;" />
+          </div>
+
+          <!-- ==================== التقليد ==================== -->
+          <div class="followup-section" id="section-imitation">
+            <h2 class="followup-section-title">التقليد (Imitation)</h2>
+            <p class="followup-section-desc">ضع علامة على كل فعل يقوم به الطفل:</p>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="tongue" />
+              هل يخرج لسانه؟
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="funny_sounds" />
+              هل يصدر أصواتاً مضحكة؟
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="wave_goodbye" />
+              هل يلوح قاصداً "وداعاً"؟ (أو يشير لـ "وداعاً"؟)
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="clap" />
+              هل يصفق بيده؟
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="shush_gesture" />
+              هل يضع إصبعه على شفتيه كإشارة لـ "السكوت" / "الصمت"؟
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="blow_kiss" />
+              هل يرسل قبلة في الهواء؟
+            </label>
+
+            <label class="followup-check-label">
+              <input type="checkbox" name="imitation" value="other_imitation" id="imitOtherCheck" onchange="toggleOtherInput('imitOtherInput', this)" />
+              أخرى (صف):
+            </label>
+            <input type="text" id="imitOtherInput" name="imitation_other" class="form-input other-input" placeholder="صف هنا..." style="display:none;" />
+          </div>
+
+        </div>
         <p id="followupError" class="form-error"></p>
         <button type="submit" class="main-btn full-btn">إعادة التقييم</button>
       </form>
     </div>
   </div>
+  <script>
+    function toggleOtherInput(inputId, checkbox) {
+      const input = document.getElementById(inputId);
+      if (input) input.style.display = checkbox.checked ? 'block' : 'none';
+    }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
