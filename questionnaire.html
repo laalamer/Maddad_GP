@@ -6,159 +6,38 @@
   <title>مدد | الاستبيان</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-main" onload="loadQuestionnairePage()">
+<body class="bg-main questionnaire-screen" onload="loadQuestionnairePage()">
   <div class="bg-blur bg-blur-top"></div>
   <div class="bg-blur bg-blur-bottom"></div>
 
-  <div class="form-page">
-    <div class="top-bar simple-top">
-      <button class="back-btn" onclick="goBackHome()">العودة</button>
-      <img src="logo.png" class="logo top-logo centered-logo" alt="شعار مدد" />
-      <div class="top-space"></div>
-    </div>
+  <header class="q-top-header">
+    <button class="q-back-btn" onclick="handleQuestionnaireBack()" aria-label="رجوع">
+      ←
+    </button>
 
-    <div class="auth-card questionnaire-card">
-      <h1 class="auth-title">استبيان الكشف المبدئي</h1>
-      <p class="auth-subtitle">
-        أجيبي عن الأسئلة التالية بدقة لمساعدتنا في إعطاء تقييم أولي.
-      </p>
+    <img src="logo.png" alt="شعار مدد" class="q-header-logo" />
+  </header>
 
-      <form id="questionnaireForm" onsubmit="submitQuestionnaire(event)">
-        <!-- العمر -->
-        <div class="question-block first-question-block">
-          <label class="question-label">كم عمر طفلك؟</label>
-          <div class="age-options">
-            <label class="option-chip">
-              <input type="radio" name="ageGroup" value="12-18" />
-              <span>12 - 18 شهر</span>
-            </label>
-            <label class="option-chip">
-              <input type="radio" name="ageGroup" value="19-24" />
-              <span>19 - 24 شهر</span>
-            </label>
-            <label class="option-chip">
-              <input type="radio" name="ageGroup" value="25-30" />
-              <span>25 - 30 شهر</span>
-            </label>
-            <label class="option-chip">
-              <input type="radio" name="ageGroup" value="31-36" />
-              <span>31 - 36 شهر</span>
-            </label>
-          </div>
-        </div>
+  <main class="q-flow-wrap">
+    <h1 class="q-main-title">استبيان الفحص المبكر لاضطراب طيف التوحد</h1>
 
-        <!-- الجنس -->
-        <div class="question-block">
-          <label class="question-label">ما جنس الطفل؟</label>
-          <div class="gender-options">
-            <label class="option-chip small-chip">
-              <input type="radio" name="gender" value="ذكر" />
-              <span>ذكر</span>
-            </label>
-            <label class="option-chip small-chip">
-              <input type="radio" name="gender" value="أنثى" />
-              <span>أنثى</span>
-            </label>
-          </div>
-        </div>
+    <p class="q-progress" id="questionProgress">السؤال: 1/12</p>
 
-        <!-- الأسئلة -->
-        <div class="question-block">
-          <div class="question-title">1- الاستجابة للاسم</div>
-          <div class="question-text">يستجيب طفلك عند مناداته باسمه، يلتفت أو ينظر إليك.</div>
-          <div class="yn-options">
-            <label><input type="radio" name="response_to_name" value="0"> نعم</label>
-            <label><input type="radio" name="response_to_name" value="1"> لا</label>
-          </div>
-        </div>
+    <section class="q-card">
+      <h2 class="q-question-title" id="questionTitle">...</h2>
+      <p class="q-question-desc" id="questionDescription"></p>
 
-        <div class="question-block">
-          <div class="question-title">2- التواصل البصري</div>
-          <div class="question-text">يتواصل طفلك معك بصريًا / ينظر إليك لمدة 3 - 5 ثوانٍ أثناء لعبك، غنائك، أو تحدثك معه.</div>
-          <div class="yn-options">
-            <label><input type="radio" name="eye_contact" value="0"> نعم</label>
-            <label><input type="radio" name="eye_contact" value="1"> لا</label>
-          </div>
-        </div>
+      <div class="q-options" id="questionOptions"></div>
 
-        <div class="question-block">
-          <div class="question-title">3- الابتسامة الاجتماعية</div>
-          <div class="question-text">عندما يستيقظ طفلك صباحًا، أو عند مقابلة أحد الوالدين أو الأشخاص المألوفين؛ فإنه يبتسم لك / لهم.</div>
-          <div class="yn-options">
-            <label><input type="radio" name="social_smile" value="0"> نعم</label>
-            <label><input type="radio" name="social_smile" value="1"> لا</label>
-          </div>
-        </div>
+      <p id="questionnaireError" class="form-error q-error"></p>
 
-        <div class="question-block">
-          <div class="question-title">4- التقليد</div>
-          <div class="question-text">يحاول طفلك تقليد أفعالك أو أفعال الأشخاص من حوله (مثل: يصلي بجانب شخص آخر، تقليد التحدث بالجوال، استخدام أدوات الطبخ، تقليد حركات الأغاني، أو أي من أدوار وأفعال من حوله).</div>
-          <div class="yn-options">
-            <label><input type="radio" name="imitation" value="0"> نعم</label>
-            <label><input type="radio" name="imitation" value="1"> لا</label>
-          </div>
-        </div>
-
-        <div class="question-block">
-          <div class="question-title">5- التمييز</div>
-          <div class="question-text">يشير طفلك إلى أعضاء جسمه عند سؤاله، يميز أفراد الأسرة بأسمائهم عن طريق التوجه إليهم / النظر إليهم، يميز الأدوات اليومية (مثل: كرسي، ملعقة، ماء، تلفاز، لمبة).</div>
-          <div class="yn-options">
-            <label><input type="radio" name="discrimination" value="0"> نعم</label>
-            <label><input type="radio" name="discrimination" value="1"> لا</label>
-          </div>
-        </div>
-
-        <div class="question-block">
-          <div class="question-title">6- الإشارة بالإصبع</div>
-          <div class="question-text">عند رغبة طفلك بالحصول على شيء معروض أمامه، أو عندما يريد لفت الانتباه إلى شيء معين؛ فإنه يشير إليه بإصبعه.</div>
-          <div class="yn-options">
-            <label><input type="radio" name="pointing_with_finger" value="0"> نعم</label>
-            <label><input type="radio" name="pointing_with_finger" value="1"> لا</label>
-          </div>
-        </div>
-
-        <div class="question-block">
-          <div class="question-title">7- تعابير الوجه</div>
-          <div class="question-text">يميز طفلك مشاعر الآخرين (الفرح، الحزن) ويعطي ردة فعل مناسبة لهذه المشاعر حسب الموقف (مثل: يتأثر ببكاء الآخرين، يفرح عند ضحك الآخرين له).</div>
-          <div class="yn-options">
-            <label><input type="radio" name="facial_expressions" value="0"> نعم</label>
-            <label><input type="radio" name="facial_expressions" value="1"> لا</label>
-          </div>
-        </div>
-
-        <div class="question-block">
-          <div class="question-title">8- الانتباه المشترك</div>
-          <div class="question-text">يحضر طفلك لعبة مهتمًا بها ويُريها للوالدين / الأشخاص المقربين ويطلب منهم المشاركة في اللعب أو ينتظر ردة فعل من الآخرين تجاهه أثناء اللعب.</div>
-          <div class="yn-options">
-            <label><input type="radio" name="joint_attention" value="0"> نعم</label>
-            <label><input type="radio" name="joint_attention" value="1"> لا</label>
-          </div>
-        </div>
-
-        <div class="question-block">
-          <div class="question-title">9- مهارات اللعب</div>
-          <div class="question-text">يندمج طفلك في أنواع مختلفة من اللعب: اللعب الوظيفي (مثل: دفع السيارة)، اللعب التخيلي (مثل: التظاهر بالتحدث بالهاتف، إطعام الدمية، الشرب من كأس فارغ، الطبخ بألعاب / أدوات المطبخ).</div>
-          <div class="yn-options">
-            <label><input type="radio" name="play_skills" value="0"> نعم</label>
-            <label><input type="radio" name="play_skills" value="1"> لا</label>
-          </div>
-        </div>
-
-        <div class="question-block">
-          <div class="question-title">10- تنفيذ الأوامر</div>
-          <div class="question-text">يتبع طفلك الأوامر اليومية البسيطة (مثل: أعطني، افتح / سكر الباب، نادِ ماما، اجلس، أعطني الريموت، جيب الشنطة).</div>
-          <div class="yn-options">
-            <label><input type="radio" name="response_to_commands" value="0"> نعم</label>
-            <label><input type="radio" name="response_to_commands" value="1"> لا</label>
-          </div>
-        </div>
-
-        <p id="questionnaireError" class="form-error"></p>
-
-        <button type="submit" class="main-btn full-btn">عرض النتيجة</button>
-      </form>
-    </div>
-  </div>
+      <div class="q-actions">
+        <button class="q-next-btn" id="nextQuestionBtn" onclick="nextQuestionStep()">
+          التالي
+        </button>
+      </div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
