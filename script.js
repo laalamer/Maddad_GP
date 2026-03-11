@@ -214,47 +214,243 @@ function getFailedSkills(answersObj) {
    QUESTIONNAIRE PAGE
 ========================= */
 
+const questionnaireSteps = [
+  {
+    key: "ageGroup",
+    title: "كم عمر طفلك؟",
+    description: "",
+    options: [
+      { label: "12 - 18 شهر", value: "12-18" },
+      { label: "19 - 24 شهر", value: "19-24" },
+      { label: "25 - 30 شهر", value: "25-30" },
+      { label: "31 - 36 شهر", value: "31-36" }
+    ]
+  },
+  {
+    key: "gender",
+    title: "ما جنس الطفل؟",
+    description: "",
+    options: [
+      { label: "ذكر", value: "ذكر" },
+      { label: "أنثى", value: "أنثى" }
+    ]
+  },
+  {
+    key: "response_to_name",
+    title: "الاستجابة للاسم",
+    description: "يستجيب طفلك عند مناداته باسمه، يلتفت أو ينظر إليك.",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "eye_contact",
+    title: "التواصل البصري",
+    description: "يتواصل طفلك معك بصريًا / ينظر إليك لمدة 3 - 5 ثوانٍ أثناء لعبك، غنائك، أو تحدثك معه.",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "social_smile",
+    title: "الابتسامة الاجتماعية",
+    description: "عندما يستيقظ طفلك صباحًا، أو عند مقابلة أحد الوالدين أو الأشخاص المألوفين؛ فإنه يبتسم لك / لهم.",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "imitation",
+    title: "التقليد",
+    description: "يحاول طفلك تقليد أفعالك أو أفعال الأشخاص من حوله (مثل: يصلي بجانب شخص آخر، تقليد التحدث بالجوال، استخدام أدوات الطبخ، تقليد حركات الأغاني، أو أي من أدوار وأفعال من حوله).",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "discrimination",
+    title: "التمييز",
+    description: "يشير طفلك إلى أعضاء جسمه عند سؤاله، يميز أفراد الأسرة بأسمائهم عن طريق التوجه إليهم / النظر إليهم، يميز الأدوات اليومية (مثل: كرسي، ملعقة، ماء، تلفاز، لمبة).",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "pointing_with_finger",
+    title: "الإشارة بالإصبع",
+    description: "عند رغبة طفلك بالحصول على شيء معروض أمامه، أو عندما يريد لفت الانتباه إلى شيء معين؛ فإنه يشير إليه بإصبعه.",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "facial_expressions",
+    title: "تعابير الوجه",
+    description: "يميز طفلك مشاعر الآخرين (الفرح، الحزن) ويعطي ردة فعل مناسبة لهذه المشاعر حسب الموقف (مثل: يتأثر ببكاء الآخرين، يفرح عند ضحك الآخرين له).",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "joint_attention",
+    title: "الانتباه المشترك",
+    description: "يحضر طفلك لعبة مهتمًا بها ويُريها للوالدين / الأشخاص المقربين ويطلب منهم المشاركة في اللعب أو ينتظر ردة فعل من الآخرين تجاهه أثناء اللعب.",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "play_skills",
+    title: "مهارات اللعب",
+    description: "يندمج طفلك في أنواع مختلفة من اللعب: اللعب الوظيفي (مثل: دفع السيارة)، اللعب التخيلي (مثل: التظاهر بالتحدث بالهاتف، إطعام الدمية، الشرب من كأس فارغ، الطبخ بألعاب / أدوات المطبخ).",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  },
+  {
+    key: "response_to_commands",
+    title: "تنفيذ الأوامر",
+    description: "يتبع طفلك الأوامر اليومية البسيطة (مثل: أعطني، افتح / سكر الباب، نادِ ماما، اجلس، أعطني الريموت، جيب الشنطة).",
+    options: [
+      { label: "نعم", value: "0" },
+      { label: "لا", value: "1" }
+    ]
+  }
+];
+
+let questionnaireState = {
+  currentStep: 0,
+  answers: {}
+};
+
 function loadQuestionnairePage() {
   const loggedIn = localStorage.getItem("maddadLoggedIn");
   const savedAccount = JSON.parse(localStorage.getItem("maddadAccount"));
 
   if (loggedIn !== "true" || !savedAccount) {
     window.location.href = "parent.html";
+    return;
+  }
+
+  questionnaireState = {
+    currentStep: 0,
+    answers: {}
+  };
+
+  renderQuestionStep();
+}
+
+function renderQuestionStep() {
+  const progress = document.getElementById("questionProgress");
+  const title = document.getElementById("questionTitle");
+  const description = document.getElementById("questionDescription");
+  const optionsBox = document.getElementById("questionOptions");
+  const nextBtn = document.getElementById("nextQuestionBtn");
+  const error = document.getElementById("questionnaireError");
+
+  if (!progress || !title || !description || !optionsBox || !nextBtn) return;
+
+  const step = questionnaireSteps[questionnaireState.currentStep];
+  const selectedValue = questionnaireState.answers[step.key] || "";
+
+  progress.textContent = `السؤال: ${questionnaireState.currentStep + 1}/${questionnaireSteps.length}`;
+  title.textContent = step.title;
+  description.textContent = step.description || "";
+  description.style.display = step.description ? "block" : "none";
+
+  optionsBox.innerHTML = "";
+
+  step.options.forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "q-option-btn";
+
+    if (String(selectedValue) === String(option.value)) {
+      button.classList.add("selected");
+    }
+
+    button.textContent = option.label;
+    button.onclick = function () {
+      selectQuestionOption(option.value);
+    };
+
+    optionsBox.appendChild(button);
+  });
+
+  if (questionnaireState.currentStep === questionnaireSteps.length - 1) {
+    nextBtn.textContent = "عرض النتيجة";
+  } else {
+    nextBtn.textContent = "التالي";
+  }
+
+  if (error) error.textContent = "";
+}
+
+function selectQuestionOption(value) {
+  const step = questionnaireSteps[questionnaireState.currentStep];
+  questionnaireState.answers[step.key] = value;
+  renderQuestionStep();
+}
+
+function nextQuestionStep() {
+  const error = document.getElementById("questionnaireError");
+  const step = questionnaireSteps[questionnaireState.currentStep];
+  const answer = questionnaireState.answers[step.key];
+
+  if (answer === undefined || answer === null || answer === "") {
+    if (error) error.textContent = "يرجى اختيار إجابة قبل المتابعة.";
+    return;
+  }
+
+  if (questionnaireState.currentStep < questionnaireSteps.length - 1) {
+    questionnaireState.currentStep += 1;
+    renderQuestionStep();
+  } else {
+    finalizeQuestionnaire();
   }
 }
 
-function submitQuestionnaire(event) {
-  event.preventDefault();
+function handleQuestionnaireBack() {
+  if (questionnaireState.currentStep > 0) {
+    questionnaireState.currentStep -= 1;
+    renderQuestionStep();
+  } else {
+    window.location.href = "home.html";
+  }
+}
 
-  const error = document.getElementById("questionnaireError");
-  if (error) error.textContent = "";
-
-  const ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-  const gender = document.querySelector('input[name="gender"]:checked');
+function finalizeQuestionnaire() {
+  const ageGroup = questionnaireState.answers.ageGroup;
+  const gender = questionnaireState.answers.gender;
 
   if (!ageGroup || !gender) {
-    if (error) error.textContent = "يرجى اختيار عمر الطفل وجنسه أولًا.";
+    const error = document.getElementById("questionnaireError");
+    if (error) error.textContent = "يرجى استكمال الإجابات أولًا.";
     return;
   }
 
   const answers = {};
 
   for (let key of skillKeys) {
-    const selected = document.querySelector(`input[name="${key}"]:checked`);
-    if (!selected) {
-      if (error) error.textContent = "يرجى الإجابة على جميع الأسئلة.";
-      return;
-    }
-    answers[key] = Number(selected.value); // نعم=0 / لا=1
+    answers[key] = Number(questionnaireState.answers[key]);
   }
 
   const score = calculateScore(answers);
-  const initialRisk = classifyRisk(ageGroup.value, score);
+  const initialRisk = classifyRisk(ageGroup, score);
   const failedSkills = getFailedSkills(answers);
 
   const assessment = {
-    ageGroup: ageGroup.value,
-    gender: gender.value,
+    ageGroup: ageGroup,
+    gender: gender,
     initialAnswers: answers,
     currentAnswers: { ...answers },
     initialScore: score,
@@ -269,7 +465,6 @@ function submitQuestionnaire(event) {
   saveAssessment(assessment);
   window.location.href = "result.html";
 }
-
 /* =========================
    RESULT PAGE
 ========================= */
