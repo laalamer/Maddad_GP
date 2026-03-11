@@ -342,7 +342,7 @@ function handleResultMainAction() {
   if (!assessment.followupComplete && (assessment.initialRisk === "medium" || assessment.initialRisk === "high")) {
     window.location.href = "followup.html";
   } else {
-    window.location.href = "home.html";
+    window.location.href = "games.html";
   }
 }
 
