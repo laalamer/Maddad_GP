@@ -213,6 +213,9 @@ function getFailedSkills(answersObj) {
 /* =========================
    QUESTIONNAIRE PAGE
 ========================= */
+/* =========================================
+   QUESTIONNAIRE NEW FLOW
+========================================= */
 
 const questionnaireSteps = [
   {
@@ -265,7 +268,7 @@ const questionnaireSteps = [
   {
     key: "imitation",
     title: "التقليد",
-    description: "يحاول طفلك تقليد أفعالك أو أفعال الأشخاص من حوله (مثل: يصلي بجانب شخص آخر، تقليد التحدث بالجوال، استخدام أدوات الطبخ، تقليد حركات الأغاني، أو أي من أدوار وأفعال من حوله).",
+    description: "يحاول طفلك تقليد أفعالك أو أفعال الأشخاص من حوله.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -274,7 +277,7 @@ const questionnaireSteps = [
   {
     key: "discrimination",
     title: "التمييز",
-    description: "يشير طفلك إلى أعضاء جسمه عند سؤاله، يميز أفراد الأسرة بأسمائهم عن طريق التوجه إليهم / النظر إليهم، يميز الأدوات اليومية (مثل: كرسي، ملعقة، ماء، تلفاز، لمبة).",
+    description: "يشير طفلك إلى أعضاء جسمه عند سؤاله ويميز الأدوات اليومية والأشخاص.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -283,7 +286,7 @@ const questionnaireSteps = [
   {
     key: "pointing_with_finger",
     title: "الإشارة بالإصبع",
-    description: "عند رغبة طفلك بالحصول على شيء معروض أمامه، أو عندما يريد لفت الانتباه إلى شيء معين؛ فإنه يشير إليه بإصبعه.",
+    description: "عند رغبة طفلك بالحصول على شيء أو لفت الانتباه؛ فإنه يشير إليه بإصبعه.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -292,7 +295,7 @@ const questionnaireSteps = [
   {
     key: "facial_expressions",
     title: "تعابير الوجه",
-    description: "يميز طفلك مشاعر الآخرين (الفرح، الحزن) ويعطي ردة فعل مناسبة لهذه المشاعر حسب الموقف (مثل: يتأثر ببكاء الآخرين، يفرح عند ضحك الآخرين له).",
+    description: "يميز طفلك مشاعر الآخرين ويعطي ردة فعل مناسبة حسب الموقف.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -301,7 +304,7 @@ const questionnaireSteps = [
   {
     key: "joint_attention",
     title: "الانتباه المشترك",
-    description: "يحضر طفلك لعبة مهتمًا بها ويُريها للوالدين / الأشخاص المقربين ويطلب منهم المشاركة في اللعب أو ينتظر ردة فعل من الآخرين تجاهه أثناء اللعب.",
+    description: "يحضر طفلك لعبة مهتمًا بها ويُريها للآخرين وينتظر تفاعلهم.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -310,7 +313,7 @@ const questionnaireSteps = [
   {
     key: "play_skills",
     title: "مهارات اللعب",
-    description: "يندمج طفلك في أنواع مختلفة من اللعب: اللعب الوظيفي (مثل: دفع السيارة)، اللعب التخيلي (مثل: التظاهر بالتحدث بالهاتف، إطعام الدمية، الشرب من كأس فارغ، الطبخ بألعاب / أدوات المطبخ).",
+    description: "يندمج طفلك في اللعب الوظيفي أو التخيلي.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -319,7 +322,7 @@ const questionnaireSteps = [
   {
     key: "response_to_commands",
     title: "تنفيذ الأوامر",
-    description: "يتبع طفلك الأوامر اليومية البسيطة (مثل: أعطني، افتح / سكر الباب، نادِ ماما، اجلس، أعطني الريموت، جيب الشنطة).",
+    description: "يتبع طفلك الأوامر اليومية البسيطة.",
     options: [
       { label: "نعم", value: "0" },
       { label: "لا", value: "1" }
@@ -327,10 +330,8 @@ const questionnaireSteps = [
   }
 ];
 
-let questionnaireState = {
-  currentStep: 0,
-  answers: {}
-};
+let currentQuestionIndex = 0;
+let questionnaireAnswers = {};
 
 function loadQuestionnairePage() {
   const loggedIn = localStorage.getItem("maddadLoggedIn");
@@ -341,116 +342,100 @@ function loadQuestionnairePage() {
     return;
   }
 
-  questionnaireState = {
-    currentStep: 0,
-    answers: {}
-  };
+  const savedProgress = JSON.parse(localStorage.getItem("maddadQuestionnaireProgress"));
+  if (savedProgress) {
+    currentQuestionIndex = savedProgress.currentQuestionIndex || 0;
+    questionnaireAnswers = savedProgress.answers || {};
+  } else {
+    currentQuestionIndex = 0;
+    questionnaireAnswers = {};
+  }
 
   renderQuestionStep();
 }
 
 function renderQuestionStep() {
+  const step = questionnaireSteps[currentQuestionIndex];
+  if (!step) return;
+
   const progress = document.getElementById("questionProgress");
   const title = document.getElementById("questionTitle");
   const description = document.getElementById("questionDescription");
   const optionsBox = document.getElementById("questionOptions");
-  const nextBtn = document.getElementById("nextQuestionBtn");
   const error = document.getElementById("questionnaireError");
 
-  if (!progress || !title || !description || !optionsBox || !nextBtn) return;
+  if (error) error.textContent = "";
 
-  const step = questionnaireSteps[questionnaireState.currentStep];
-  const selectedValue = questionnaireState.answers[step.key] || "";
-
-  progress.textContent = `السؤال: ${questionnaireState.currentStep + 1}/${questionnaireSteps.length}`;
+  progress.textContent = `السؤال: ${currentQuestionIndex + 1}/${questionnaireSteps.length}`;
   title.textContent = step.title;
   description.textContent = step.description || "";
-  description.style.display = step.description ? "block" : "none";
 
   optionsBox.innerHTML = "";
 
-  step.options.forEach((option) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "q-option-btn";
+  step.options.forEach(option => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "questionnaire-option";
 
-    if (String(selectedValue) === String(option.value)) {
-      button.classList.add("selected");
+    if (questionnaireAnswers[step.key] === option.value) {
+      btn.classList.add("selected");
     }
 
-    button.textContent = option.label;
-    button.onclick = function () {
-      selectQuestionOption(option.value);
-    };
+    btn.textContent = option.label;
+    btn.onclick = () => selectQuestionOption(step.key, option.value);
 
-    optionsBox.appendChild(button);
+    optionsBox.appendChild(btn);
   });
 
-  if (questionnaireState.currentStep === questionnaireSteps.length - 1) {
-    nextBtn.textContent = "عرض النتيجة";
-  } else {
-    nextBtn.textContent = "التالي";
-  }
-
-  if (error) error.textContent = "";
+  localStorage.setItem("maddadQuestionnaireProgress", JSON.stringify({
+    currentQuestionIndex,
+    answers: questionnaireAnswers
+  }));
 }
 
-function selectQuestionOption(value) {
-  const step = questionnaireSteps[questionnaireState.currentStep];
-  questionnaireState.answers[step.key] = value;
+function selectQuestionOption(key, value) {
+  questionnaireAnswers[key] = value;
   renderQuestionStep();
 }
 
-function nextQuestionStep() {
+function goNextQuestion() {
+  const step = questionnaireSteps[currentQuestionIndex];
   const error = document.getElementById("questionnaireError");
-  const step = questionnaireSteps[questionnaireState.currentStep];
-  const answer = questionnaireState.answers[step.key];
 
-  if (answer === undefined || answer === null || answer === "") {
+  if (!questionnaireAnswers[step.key]) {
     if (error) error.textContent = "يرجى اختيار إجابة قبل المتابعة.";
     return;
   }
 
-  if (questionnaireState.currentStep < questionnaireSteps.length - 1) {
-    questionnaireState.currentStep += 1;
+  if (currentQuestionIndex < questionnaireSteps.length - 1) {
+    currentQuestionIndex++;
     renderQuestionStep();
   } else {
-    finalizeQuestionnaire();
+    finishQuestionnaire();
   }
 }
 
-function handleQuestionnaireBack() {
-  if (questionnaireState.currentStep > 0) {
-    questionnaireState.currentStep -= 1;
-    renderQuestionStep();
-  } else {
-    window.location.href = "home.html";
-  }
-}
-
-function finalizeQuestionnaire() {
-  const ageGroup = questionnaireState.answers.ageGroup;
-  const gender = questionnaireState.answers.gender;
-
-  if (!ageGroup || !gender) {
-    const error = document.getElementById("questionnaireError");
-    if (error) error.textContent = "يرجى استكمال الإجابات أولًا.";
-    return;
-  }
-
-  const answers = {};
-
-  for (let key of skillKeys) {
-    answers[key] = Number(questionnaireState.answers[key]);
-  }
+function finishQuestionnaire() {
+  const answers = {
+    response_to_name: Number(questionnaireAnswers.response_to_name),
+    eye_contact: Number(questionnaireAnswers.eye_contact),
+    social_smile: Number(questionnaireAnswers.social_smile),
+    imitation: Number(questionnaireAnswers.imitation),
+    discrimination: Number(questionnaireAnswers.discrimination),
+    pointing_with_finger: Number(questionnaireAnswers.pointing_with_finger),
+    facial_expressions: Number(questionnaireAnswers.facial_expressions),
+    joint_attention: Number(questionnaireAnswers.joint_attention),
+    play_skills: Number(questionnaireAnswers.play_skills),
+    response_to_commands: Number(questionnaireAnswers.response_to_commands)
+  };
 
   const score = calculateScore(answers);
-  const initialRisk = classifyRisk(ageGroup, score);
+  const initialRisk = classifyRisk(questionnaireAnswers.ageGroup, score);
   const failedSkills = getFailedSkills(answers);
 
   const assessment = {
-    ageGroup: ageGroup,
-    gender: gender,
+    ageGroup: questionnaireAnswers.ageGroup,
+    gender: questionnaireAnswers.gender,
     initialAnswers: answers,
     currentAnswers: { ...answers },
     initialScore: score,
@@ -463,8 +448,10 @@ function finalizeQuestionnaire() {
   };
 
   saveAssessment(assessment);
+  localStorage.removeItem("maddadQuestionnaireProgress");
   window.location.href = "result.html";
 }
+
 /* =========================
    RESULT PAGE
 ========================= */
