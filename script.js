@@ -213,9 +213,7 @@ function getFailedSkills(answersObj) {
 /* =========================
    QUESTIONNAIRE PAGE
 ========================= */
-/* =========================================
-   QUESTIONNAIRE NEW FLOW
-========================================= */
+
 
 const questionnaireSteps = [
   {
@@ -354,6 +352,19 @@ function loadQuestionnairePage() {
   renderQuestionStep();
 }
 
+function startQuestionnaire() {
+  localStorage.removeItem("maddadQuestionnaireProgress");
+  localStorage.removeItem("maddadAssessment");
+  window.location.href = "questionnaire.html";
+}
+
+function resetQuestionnaireAndGoHome() {
+  localStorage.removeItem("maddadQuestionnaireProgress");
+  localStorage.removeItem("maddadAssessment");
+  currentQuestionIndex = 0;
+  questionnaireAnswers = {};
+  window.location.href = "home.html";
+}
 function renderQuestionStep() {
   const step = questionnaireSteps[currentQuestionIndex];
   if (!step) return;
