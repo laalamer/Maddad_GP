@@ -318,7 +318,7 @@ function loadResultPage() {
     message = assessment.followupComplete
       ? "بعد أسئلة المتابعة، ما زالت هناك مؤشرات مرتفعة تستحق متابعة متخصصة."
       : "ظهرت مؤشرات مرتفعة وتحتاج إلى أسئلة متابعة لإعطاء صورة أدق.";
-    btnText = assessment.followupComplete ? "العودة للرئيسية" : "الانتقال لأسئلة المتابعة";
+    btnText = assessment.followupComplete ? "الأنشطة المقترحة" : "الانتقال لأسئلة المتابعة";
   }
 
   resultText.textContent = message;
