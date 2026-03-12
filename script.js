@@ -503,7 +503,7 @@ function loadResultPage() {
     message = assessment.followupComplete
       ? "بعد أسئلة المتابعة، ما زالت هناك بعض المؤشرات التي تحتاج متابعة واهتمام."
       : "ظهرت بعض المؤشرات التي تحتاج إلى توضيح إضافي عبر أسئلة المتابعة.";
-    btnText = assessment.followupComplete ? "العودة للرئيسية" : "الانتقال لأسئلة المتابعة";
+    btnText = assessment.followupComplete ? "الأنشطة المقترحة" : "الانتقال لأسئلة المتابعة";
   } else {
     resultBadge.style.background = "#FDECEC";
     resultBadge.style.color = "#C62828";
@@ -511,7 +511,7 @@ function loadResultPage() {
     message = assessment.followupComplete
       ? "بعد أسئلة المتابعة، ما زالت هناك مؤشرات مرتفعة تستحق متابعة متخصصة."
       : "ظهرت مؤشرات مرتفعة وتحتاج إلى أسئلة متابعة لإعطاء صورة أدق.";
-    btnText = assessment.followupComplete ? "العودة للرئيسية" : "الانتقال لأسئلة المتابعة";
+    btnText = assessment.followupComplete ? "الأنشطة المقترحة" : "الانتقال لأسئلة المتابعة";
   }
 
   resultText.textContent = message;
