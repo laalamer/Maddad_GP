@@ -133,13 +133,32 @@
 
     function validatePassword(input, errorId) {
       const error = document.getElementById(errorId);
-      if (!input.value) {
-        error.textContent = "كلمة المرور مطلوبة";
-      } else if (input.value.length < 8) {
-        error.textContent = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
-      } else {
-        error.textContent = "";
+      const value = input.value;
+
+      const rules = [
+        { test: value.length >= 8,                                    label: "8 أحرف على الأقل" },
+        { test: /[A-Z]/.test(value),                                  label: "حرف كبير (A-Z)" },
+        { test: /[a-z]/.test(value),                                  label: "حرف صغير (a-z)" },
+        { test: /[0-9]/.test(value),                                  label: "رقم واحد على الأقل" },
+        { test: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value), label: "رمز خاص (!@#$%...)" },
+      ];
+
+      if (!value) {
+        error.innerHTML = "كلمة المرور مطلوبة";
+        input.dataset.valid = "false";
+        return;
       }
+
+      const allPassed = rules.every(r => r.test);
+      input.dataset.valid = allPassed ? "true" : "false";
+
+      const listItems = rules.map(r =>
+        `<li style="color:${r.test ? 'green' : 'red'}; list-style:none;">
+          ${r.test ? '✅' : '❌'} ${r.label}
+        </li>`
+      ).join("");
+
+      error.innerHTML = `<ul style="margin:4px 0; padding:0;">${listItems}</ul>`;
     }
 
     function validateName(input, errorId) {
@@ -164,7 +183,7 @@
       validatePassword(passwordInput, "loginPasswordError");
 
       const emailValid = !document.getElementById("loginEmailError").textContent;
-      const passwordValid = !document.getElementById("loginPasswordError").textContent;
+      const passwordValid = passwordInput.dataset.valid === "true";
 
       if (emailValid && passwordValid) {
         parentLogin();
@@ -182,7 +201,7 @@
 
       const nameValid = !document.getElementById("signupNameError").textContent;
       const emailValid = !document.getElementById("signupEmailError").textContent;
-      const passwordValid = !document.getElementById("signupPasswordError").textContent;
+      const passwordValid = passwordInput.dataset.valid === "true";
 
       if (nameValid && emailValid && passwordValid) {
         parentSignup();
