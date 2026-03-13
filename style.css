@@ -1020,3 +1020,26 @@ text-align:right;
     gap:14px;
   }
 }
+
+.page-title{
+    text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    margin-top:40px;
+    margin-bottom:20px;
+}
+
+.back-home{
+    text-align: center;
+    margin-top: 100px;
+    margin-bottom: 80px;
+}
+
+.back-btn{
+    background:#5b5bd6;
+    color:white;
+    padding:10px 25px;
+    border-radius:20px;
+    text-decoration:none;
+    font-size:16px;
+}
