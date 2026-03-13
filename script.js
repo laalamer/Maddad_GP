@@ -442,7 +442,11 @@ function finishQuestionnaire() {
 
   const score = calculateScore(answers);
   const initialRisk = classifyRisk(questionnaireAnswers.ageGroup, score);
-  const failedSkills = getFailedSkills(answers);
+let failedSkills = getFailedSkills(answers);
+// استثناء: الاستجابة للاسم لازم يظهر لها Follow-up دائماً
+if (!failedSkills.includes("response_to_name")) {
+  failedSkills.push("response_to_name");
+}
 
   const assessment = {
     ageGroup: questionnaireAnswers.ageGroup,
@@ -608,16 +612,16 @@ const FOLLOWUP_STEPS_CONFIG = {
       name: "eye_contact_sub"
     }
   },
-  response_to_name: {
-    title: "متابعة: الاستجابة للاسم",
-    question: "هل طفلك يستجيب لاسمه في مواقف أخرى حتى لو لم يكن الأمر ثابتًا؟ على سبيل المثال، قد يستجيب في الحديقة أو عند الحماس، لكنه لا يستجيب عند مشاهدة التلفاز أو عند تركيزه الشديد على نشاط ما.",
-    type: "radio",
-    name: "response_to_name_followup",
-    options: [
-      { label: "نعم", value: "yes" },
-      { label: "لا",  value: "no"  }
-    ]
-  },
+response_to_name: {
+  title: "متابعة: الاستجابة للاسم",
+  question: "هل طفلك يستجيب لاسمه في مواقف أخرى حتى لو لم يكن الأمر ثابتًا؟ (مثال: قد يستجيب في الحديقة أو عند الحماس لكنه لا يستجيب أثناء مشاهدة التلفاز أو عندما يكون مركزًا على نشاط).",
+  type: "radio",
+  name: "response_to_name_followup",
+  options: [
+    { label: "نعم", value: "yes" },
+    { label: "لا", value: "no" }
+  ]
+},
   pointing_with_finger: {
     title: "متابعة: الإشارة بالإصبع",
     question: "اختاري ما ينطبق على طفلك:",
@@ -675,6 +679,17 @@ function renderFollowupStep() {
   const isLast  = currentFollowupIndex === total - 1;
   const isFirst = currentFollowupIndex === 0;
   const step    = FOLLOWUP_STEPS_CONFIG[skill];
+  const assessment = getAssessment();
+// تغيير سؤال الاستجابة للاسم حسب جواب السؤال الأساسي
+if (skill === "response_to_name") {
+  const initialAnswer = assessment.initialAnswers.response_to_name;
+
+  if (initialAnswer === 1) {
+    step.question = "هل طفلك يستجيب لاسمه في مواقف أخرى حتى لو لم يكن الأمر ثابتًا؟ (مثال: قد يستجيب في الحديقة أو عند الحماس لكنه لا يستجيب أثناء مشاهدة التلفاز أو عندما يكون مركزًا على نشاط).";
+  } else {
+    step.question = "هل استجابة طفلك مرتبطة فعلاً بمعرفته لاسمه، أم أنها تحدث بسبب نبرة الصوت أو التلميحات؟ (مثال: إذا قلت اسمه بصوت عادي من بعيد هل ينظر إليك؟)";
+  }
+}
 
   // Ensure state exists for this field
   if (!followupBtnState[step.name]) {
@@ -905,6 +920,16 @@ function finalizeFollowup() {
   assessment.finalScore = finalScore;
   assessment.finalRisk = finalRisk;
   assessment.followupComplete = true;
+   // اضافة غلا علشان الداشبورد
+  let history = JSON.parse(localStorage.getItem("maddadHistory")) || [];
+
+history.push({
+date: new Date().toLocaleDateString("ar-SA"),
+risk: riskTextArabic(finalRisk),
+score: finalScore
+});
+
+localStorage.setItem("maddadHistory", JSON.stringify(history));
 
   saveAssessment(assessment);
   window.location.href = "result.html";
