@@ -543,9 +543,12 @@ function handleResultMainAction() {
    FOLLOWUP PAGE
 ========================= */
 
+let followupSteps = [];
+let currentFollowupIndex = 0;
+let followupCollectedAnswers = {};
+
 function loadFollowupPage() {
   const assessment = getAssessment();
-  const container = document.getElementById("followupContainer");
 
   if (!assessment) {
     window.location.href = "questionnaire.html";
@@ -558,76 +561,19 @@ function loadFollowupPage() {
   }
 
   const failed = assessment.failedSkills || [];
-  let html = "";
+  followupSteps = [];
+  followupCollectedAnswers = {};
+  followupBtnState = {};
+  currentFollowupIndex = 0;
 
-  if (failed.includes("eye_contact")) {
-    html += `
-      <div class="followup-section">
-        <h3>متابعة: التواصل البصري</h3>
-        <div class="followup-main-question">هل طفلك يناظر عينك؟</div>
+  if (failed.includes("eye_contact"))        followupSteps.push("eye_contact");
+  if (failed.includes("response_to_name"))   followupSteps.push("response_to_name");
+  if (failed.includes("pointing_with_finger")) followupSteps.push("pointing_with_finger");
+  if (failed.includes("imitation"))          followupSteps.push("imitation");
+  if (failed.includes("discrimination"))     followupSteps.push("discrimination");
 
-        <div class="checkbox-list">
-          <label class="checkbox-item"><input type="checkbox" name="eye_contact_context" value="needs"> لما يحتاج شيء</label>
-          <label class="checkbox-item"><input type="checkbox" name="eye_contact_context" value="play"> لما يلعب معك</label>
-          <label class="checkbox-item"><input type="checkbox" name="eye_contact_context" value="eating"> أثناء الأكل</label>
-          <label class="checkbox-item"><input type="checkbox" name="eye_contact_context" value="dressing"> أثناء اللبس</label>
-          <label class="checkbox-item"><input type="checkbox" name="eye_contact_context" value="story"> عندما تقرأ له قصة</label>
-          <label class="checkbox-item"><input type="checkbox" name="eye_contact_context" value="talking"> عندما تتحدث معه</label>
-        </div>
-
-        <div class="subquestion-box">
-          <div class="subquestion-title">إذا تم اختيار خيار واحد فقط: لما أنت وطفلك سوا خلال اليوم، هل ينظر إلى عينك على الأقل 5 ثوانٍ؟</div>
-          <div class="sub-yesno">
-            <label><input type="radio" name="eye_contact_sub" value="yes"> نعم</label>
-            <label><input type="radio" name="eye_contact_sub" value="no"> لا</label>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  if (failed.includes("response_to_name")) {
-    html += `
-      <div class="followup-section">
-        <h3>متابعة: الاستجابة للاسم</h3>
-        <div class="followup-main-question">
-          هل طفلك يستجيب لاسمه في مواقف أخرى حتى لو لم يكن الأمر ثابتًا؟ على سبيل المثال، قد يستجيب في الحديقة أو عند الحماس، لكنه لا يستجيب عند مشاهدة التلفاز أو عند تركيزه الشديد على نشاط ما.
-        </div>
-
-        <div class="sub-yesno">
-          <label><input type="radio" name="response_to_name_followup" value="yes"> نعم</label>
-          <label><input type="radio" name="response_to_name_followup" value="no"> لا</label>
-        </div>
-      </div>
-    `;
-  }
-
-  if (failed.includes("pointing_with_finger")) {
-    html += `
-      <div class="followup-section">
-        <h3>متابعة: الإشارة بالإصبع</h3>
-        <div class="followup-main-question">اختاري ما ينطبق على طفلك:</div>
-
-        <div class="checkbox-list">
-          <label class="checkbox-item"><input type="checkbox" name="pointing_context" value="hand"> هل طفلك يمد يده للأشياء؟</label>
-          <label class="checkbox-item"><input type="checkbox" name="pointing_context" value="lead"> هل يقودك بيده نحو الشيء؟</label>
-          <label class="checkbox-item"><input type="checkbox" name="pointing_context" value="take"> هل يحاول أخذ الشيء بنفسه؟</label>
-          <label class="checkbox-item"><input type="checkbox" name="pointing_context" value="voice"> هل يطلب الشيء باستخدام كلمات أو أصوات؟</label>
-        </div>
-
-        <div class="subquestion-box">
-          <div class="subquestion-title">إذا تم اختيار خيار واحد فقط: إذا قلت له "وريني"، هل سيشير طفلك إلى الشيء؟</div>
-          <div class="sub-yesno">
-            <label><input type="radio" name="pointing_sub" value="yes"> نعم</label>
-            <label><input type="radio" name="pointing_sub" value="no"> لا</label>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  if (html === "") {
-    html = `
+  if (followupSteps.length === 0) {
+    document.getElementById("followupContainer").innerHTML = `
       <div class="followup-section">
         <h3>لا توجد أسئلة متابعة مدعومة حاليًا</h3>
         <div class="followup-main-question">
@@ -635,70 +581,324 @@ function loadFollowupPage() {
         </div>
       </div>
     `;
+    return;
   }
 
-  container.innerHTML = html;
+  renderFollowupStep();
 }
 
-function submitFollowup(event) {
-  event.preventDefault();
+/* followup button state: { fieldName: Set([values]) or string for radio } */
+let followupBtnState = {};
 
-  const assessment = getAssessment();
-  const error = document.getElementById("followupError");
+const FOLLOWUP_STEPS_CONFIG = {
+  eye_contact: {
+    title: "متابعة: التواصل البصري",
+    question: "هل طفلك يناظر عينك؟",
+    type: "checkbox",
+    name: "eye_contact_context",
+    options: [
+      { label: "لما يحتاج شيء",        value: "needs"    },
+      { label: "لما يلعب معك",          value: "play"     },
+      { label: "أثناء الأكل",           value: "eating"   },
+      { label: "أثناء اللبس",           value: "dressing" },
+      { label: "عندما تقرأ له قصة",     value: "story"    },
+      { label: "عندما تتحدث معه",       value: "talking"  }
+    ],
+    subQuestion: {
+      id: "eyeSubBox",
+      title: "لما أنت وطفلك سوا خلال اليوم، هل ينظر إلى عينك على الأقل 5 ثوانٍ؟",
+      name: "eye_contact_sub"
+    }
+  },
+  response_to_name: {
+    title: "متابعة: الاستجابة للاسم",
+    question: "هل طفلك يستجيب لاسمه في مواقف أخرى حتى لو لم يكن الأمر ثابتًا؟ على سبيل المثال، قد يستجيب في الحديقة أو عند الحماس، لكنه لا يستجيب عند مشاهدة التلفاز أو عند تركيزه الشديد على نشاط ما.",
+    type: "radio",
+    name: "response_to_name_followup",
+    options: [
+      { label: "نعم", value: "yes" },
+      { label: "لا",  value: "no"  }
+    ]
+  },
+  pointing_with_finger: {
+    title: "متابعة: الإشارة بالإصبع",
+    question: "اختاري ما ينطبق على طفلك:",
+    type: "checkbox",
+    name: "pointing_context",
+    options: [
+      { label: "هل طفلك يمد يده للأشياء؟",                       value: "hand"  },
+      { label: "هل يقودك بيده نحو الشيء؟",                       value: "lead"  },
+      { label: "هل يحاول أخذ الشيء بنفسه؟",                      value: "take"  },
+      { label: "هل يطلب الشيء باستخدام كلمات أو أصوات؟",         value: "voice" }
+    ],
+    subQuestion: {
+      id: "pointSubBox",
+      title: 'إذا قلت له "وريني"، هل سيشير طفلك إلى الشيء؟',
+      name: "pointing_sub"
+    }
+  },
+  imitation: {
+    title: "متابعة: التقليد",
+    question: "اختاري ما ينطبق على طفلك:",
+    type: "checkbox",
+    name: "imitation_context",
+    options: [
+      { label: "هل يخرج لسانه؟",                                                          value: "tongue" },
+      { label: "هل يصدر أصواتاً مضحكة؟",                                                  value: "sounds" },
+      { label: 'هل يلوح قاصداً "وداعاً"؟ (أو يشير لـ "وداعاً"؟)',                        value: "wave"   },
+      { label: "هل يصفق بيده؟",                                                            value: "clap"   },
+      { label: 'هل يضع إصبعه على شفتيه كإشارة لـ "السكوت"/"الصمت"؟',                     value: "shush"  },
+      { label: "هل يرسل قبلة في الهواء؟",                                                  value: "kiss"   },
+      { label: "أخرى (صف)",                                                                value: "other", isOther: true }
+    ]
+  },
+  discrimination: {
+    title: "متابعة: التمييز",
+    question: "اختاري ما ينطبق على طفلك:",
+    type: "checkbox",
+    name: "discrimination_context",
+    options: [
+      { label: 'التعرّف على جزء من جسمهم عندما تسأل "أين أنفك؟" أو "أين عينك؟"',          value: "body_part"    },
+      { label: 'الالتفات أو النظر إلى والد أو شقيق عندما تذكر اسمهم "أين ماما؟"',         value: "look_person"  },
+      { label: 'الإشارة إلى غرض مألوف ويومي (مثل كرسي أو مصباح) عندما تسأل "أين الكرسي؟"', value: "point_object" },
+      { label: 'إحضار غرض مألوف ويومي (مثل ملعقة أو بطانية) عندما تطلب منهم "أحضر الملعقة"', value: "bring_object" },
+      { label: "أخرى (اذكر)",                                                              value: "other", isOther: true }
+    ]
+  }
+};
+
+function renderFollowupStep() {
+  const container = document.getElementById("followupContainer");
+  const skill  = followupSteps[currentFollowupIndex];
+  const total  = followupSteps.length;
+  const isLast  = currentFollowupIndex === total - 1;
+  const isFirst = currentFollowupIndex === 0;
+  const step    = FOLLOWUP_STEPS_CONFIG[skill];
+
+  // Ensure state exists for this field
+  if (!followupBtnState[step.name]) {
+    followupBtnState[step.name] = step.type === "radio" ? "" : new Set();
+  }
+  if (step.subQuestion && !followupBtnState[step.subQuestion.name]) {
+    followupBtnState[step.subQuestion.name] = "";
+  }
+
+  /* ---- Build main options ---- */
+  let optionsHtml = "";
+  step.options.forEach(opt => {
+    const isSelected = step.type === "radio"
+      ? followupBtnState[step.name] === opt.value
+      : followupBtnState[step.name].has(opt.value);
+
+    optionsHtml += `
+      <button type="button"
+        class="questionnaire-option${isSelected ? " selected" : ""}"
+        data-field="${step.name}"
+        data-value="${opt.value}"
+        data-type="${step.type}"
+        ${opt.isOther ? 'data-is-other="true"' : ""}
+        onclick="handleFollowupOptionClick(this)">
+        ${opt.label}
+      </button>
+    `;
+    if (opt.isOther) {
+      const isOtherSelected = step.type === "radio"
+        ? followupBtnState[step.name] === "other"
+        : followupBtnState[step.name].has("other");
+      optionsHtml += `
+        <div id="${step.name}_other_box" style="display:${isOtherSelected ? "block" : "none"}; margin-top:-6px; padding: 0 2px 8px;">
+          <input type="text" id="${step.name}_other_text"
+            placeholder="اكتب هنا..."
+            style="width:100%; padding:10px 14px; border:1.5px solid #c5d5ee; border-radius:12px; font-size:15px; font-family:inherit; direction:rtl; background:#fff; outline:none; box-sizing:border-box;">
+        </div>
+      `;
+    }
+  });
+
+  /* ---- Build sub-question (eye_contact / pointing_with_finger) ---- */
+  let subHtml = "";
+  if (step.subQuestion) {
+    const checkedCount = followupBtnState[step.name].size;
+    const subVisible   = checkedCount === 1;
+    const subName      = step.subQuestion.name;
+
+    let subOptHtml = "";
+    ["yes", "no"].forEach(val => {
+      const lbl = val === "yes" ? "نعم" : "لا";
+      const sel = followupBtnState[subName] === val;
+      subOptHtml += `
+        <button type="button"
+          class="questionnaire-option${sel ? " selected" : ""}"
+          data-field="${subName}"
+          data-value="${val}"
+          data-type="radio"
+          onclick="handleFollowupOptionClick(this)">
+          ${lbl}
+        </button>
+      `;
+    });
+
+    subHtml = `
+      <div id="${step.subQuestion.id}" style="display:${subVisible ? "block" : "none"}; margin-top:28px;">
+        <div class="question-title" style="font-size:16px; margin-bottom:16px;">
+          ${step.subQuestion.title}
+        </div>
+        <div id="${subName}_options">
+          ${subOptHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = `
+    <div id="questionProgress" class="question-progress">
+      السؤال: ${currentFollowupIndex + 1}/${total}
+    </div>
+    <div class="question-title">${step.title}</div>
+    <div class="question-description">${step.question}</div>
+    <div id="questionOptions">
+      ${optionsHtml}
+    </div>
+    ${subHtml}
+    <div id="questionnaireError" style="color:red; text-align:center; margin-top:12px; min-height:20px; font-size:14px;"></div>
+    <div style="display:flex; justify-content:center; gap:16px; margin-top:28px;">
+      ${!isFirst ? `<button type="button" class="questionnaire-next-btn" onclick="goPrevFollowup()">السابق</button>` : ""}
+      <button type="button" class="questionnaire-next-btn" onclick="goNextFollowup()">${isLast ? "إرسال" : "التالي"}</button>
+    </div>
+  `;
+}
+
+function handleFollowupOptionClick(btn) {
+  const field   = btn.dataset.field;
+  const value   = btn.dataset.value;
+  const type    = btn.dataset.type;
+  const isOther = btn.dataset.isOther === "true";
+
+  if (type === "radio") {
+    // Deselect all buttons with same field, select clicked
+    document.querySelectorAll(`[data-field="${field}"]`).forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    followupBtnState[field] = value;
+  } else {
+    // Checkbox: toggle
+    if (followupBtnState[field].has(value)) {
+      followupBtnState[field].delete(value);
+      btn.classList.remove("selected");
+    } else {
+      followupBtnState[field].add(value);
+      btn.classList.add("selected");
+    }
+
+    // Show/hide "other" text box
+    if (isOther) {
+      const otherBox = document.getElementById(`${field}_other_box`);
+      if (otherBox) otherBox.style.display = followupBtnState[field].has("other") ? "block" : "none";
+      if (!followupBtnState[field].has("other")) {
+        const otherTxt = document.getElementById(`${field}_other_text`);
+        if (otherTxt) otherTxt.value = "";
+      }
+    }
+
+    // Show/hide sub-question when count === 1 (eye_contact / pointing_with_finger)
+    const skill = followupSteps[currentFollowupIndex];
+    const step  = FOLLOWUP_STEPS_CONFIG[skill];
+    if (step.subQuestion && step.name === field) {
+      const subBox = document.getElementById(step.subQuestion.id);
+      if (subBox) subBox.style.display = followupBtnState[field].size === 1 ? "block" : "none";
+      // Reset sub-answer when hidden
+      if (followupBtnState[field].size !== 1) {
+        followupBtnState[step.subQuestion.name] = "";
+        document.querySelectorAll(`[data-field="${step.subQuestion.name}"]`)
+          .forEach(b => b.classList.remove("selected"));
+      }
+    }
+  }
+}
+
+function goNextFollowup() {
+  const error = document.getElementById("questionnaireError");
   if (error) error.textContent = "";
 
+  const skill = followupSteps[currentFollowupIndex];
+  const step  = FOLLOWUP_STEPS_CONFIG[skill];
+
+  // --- Validate & score current step using followupBtnState ---
+
+  if (skill === "eye_contact") {
+    const count = followupBtnState[step.name] ? followupBtnState[step.name].size : 0;
+    if (count === 0) {
+      followupCollectedAnswers.eye_contact = 1;
+    } else if (count >= 2) {
+      followupCollectedAnswers.eye_contact = 0;
+    } else {
+      const subVal = followupBtnState[step.subQuestion.name];
+      if (!subVal) {
+        if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالتواصل البصري.";
+        return;
+      }
+      followupCollectedAnswers.eye_contact = subVal === "yes" ? 0 : 1;
+    }
+  }
+
+  else if (skill === "response_to_name") {
+    const val = followupBtnState[step.name];
+    if (!val) {
+      if (error) error.textContent = "يرجى الإجابة على سؤال متابعة الاستجابة للاسم.";
+      return;
+    }
+    followupCollectedAnswers.response_to_name = val === "yes" ? 0 : 1;
+  }
+
+  else if (skill === "pointing_with_finger") {
+    const count = followupBtnState[step.name] ? followupBtnState[step.name].size : 0;
+    if (count === 0) {
+      followupCollectedAnswers.pointing_with_finger = 1;
+    } else if (count >= 2) {
+      followupCollectedAnswers.pointing_with_finger = 0;
+    } else {
+      const subVal = followupBtnState[step.subQuestion.name];
+      if (!subVal) {
+        if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالإشارة بالإصبع.";
+        return;
+      }
+      followupCollectedAnswers.pointing_with_finger = subVal === "yes" ? 0 : 1;
+    }
+  }
+
+  else if (skill === "imitation") {
+    const count = followupBtnState[step.name] ? followupBtnState[step.name].size : 0;
+    followupCollectedAnswers.imitation = count >= 2 ? 0 : 1;
+  }
+
+  else if (skill === "discrimination") {
+    const count = followupBtnState[step.name] ? followupBtnState[step.name].size : 0;
+    followupCollectedAnswers.discrimination = count >= 2 ? 0 : 1;
+  }
+
+  // --- Advance or finalize ---
+  if (currentFollowupIndex < followupSteps.length - 1) {
+    currentFollowupIndex++;
+    renderFollowupStep();
+  } else {
+    finalizeFollowup();
+  }
+}
+
+function goPrevFollowup() {
+  if (currentFollowupIndex > 0) {
+    currentFollowupIndex--;
+    renderFollowupStep();
+  }
+}
+
+function finalizeFollowup() {
+  const assessment = getAssessment();
   if (!assessment) {
     window.location.href = "questionnaire.html";
     return;
   }
 
-  const updatedAnswers = { ...assessment.currentAnswers };
-
-  if (assessment.failedSkills.includes("eye_contact")) {
-    const eyeChecks = document.querySelectorAll('input[name="eye_contact_context"]:checked');
-    const eyeCount = eyeChecks.length;
-
-    if (eyeCount === 0) {
-      updatedAnswers.eye_contact = 1;
-    } else if (eyeCount >= 2) {
-      updatedAnswers.eye_contact = 0;
-    } else if (eyeCount === 1) {
-      const eyeSub = document.querySelector('input[name="eye_contact_sub"]:checked');
-      if (!eyeSub) {
-        if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالتواصل البصري.";
-        return;
-      }
-      updatedAnswers.eye_contact = eyeSub.value === "yes" ? 0 : 1;
-    }
-  }
-
-  if (assessment.failedSkills.includes("response_to_name")) {
-    const nameFollow = document.querySelector('input[name="response_to_name_followup"]:checked');
-    if (!nameFollow) {
-      if (error) error.textContent = "يرجى الإجابة على سؤال متابعة الاستجابة للاسم.";
-      return;
-    }
-    updatedAnswers.response_to_name = nameFollow.value === "yes" ? 0 : 1;
-  }
-
-  if (assessment.failedSkills.includes("pointing_with_finger")) {
-    const pointChecks = document.querySelectorAll('input[name="pointing_context"]:checked');
-    const pointCount = pointChecks.length;
-
-    if (pointCount === 0) {
-      updatedAnswers.pointing_with_finger = 1;
-    } else if (pointCount >= 2) {
-      updatedAnswers.pointing_with_finger = 0;
-    } else if (pointCount === 1) {
-      const pointSub = document.querySelector('input[name="pointing_sub"]:checked');
-      if (!pointSub) {
-        if (error) error.textContent = "يرجى استكمال سؤال المتابعة الخاص بالإشارة بالإصبع.";
-        return;
-      }
-      updatedAnswers.pointing_with_finger = pointSub.value === "yes" ? 0 : 1;
-    }
-  }
-
+  const updatedAnswers = { ...assessment.currentAnswers, ...followupCollectedAnswers };
   const finalScore = calculateScore(updatedAnswers);
   const finalRisk = classifyRisk(assessment.ageGroup, finalScore);
 
@@ -709,6 +909,11 @@ function submitFollowup(event) {
 
   saveAssessment(assessment);
   window.location.href = "result.html";
+}
+
+function submitFollowup(event) {
+  if (event) event.preventDefault();
+  // Navigation is now handled by goNextFollowup() / goPrevFollowup()
 }
 
 
