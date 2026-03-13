@@ -462,6 +462,13 @@ body{
   margin-bottom: 22px;
 }
 
+.form-page{
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 .questionnaire-card{
   max-width: 600px;
   margin: 0 auto;
@@ -634,125 +641,57 @@ text-align:right;
 }
 
 /* =========================
-   FOLLOWUP PAGE
+   FOLLOWUP PAGE — alias classes to match questionnaire styles exactly
 ========================= */
 
-.followup-section{
-background:#f9f9fc;
-border:1px solid #e5e8f2;
-border-radius:20px;
-padding:24px;
-margin-bottom:18px;
+.question-progress{
+  font-size: 18px;
+  font-weight: 700;
+  color: #3559A8;
+  margin-bottom: 22px;
+  text-align: center;
 }
-
-.followup-section h3{
-font-size:26px;
-color:#4E648D;
-margin-bottom:14px;
-}
-
-.followup-main-question{
-font-size:19px;
-font-weight:bold;
-line-height:1.8;
-color:#2F3443;
-margin-bottom:16px;
-}
-
-.checkbox-list{
-display:grid;
-gap:12px;
-margin-bottom:16px;
-}
-
-.checkbox-item{
-background:white;
-border:1px solid #dde2ee;
-border-radius:14px;
-padding:14px 16px;
-font-size:17px;
-color:#4e5668;
-}
-
-.checkbox-item input{
-margin-left:10px;
-}
-
-.subquestion-box{
-background:#fff;
-border:1px dashed #c8cfdf;
-border-radius:16px;
-padding:18px;
-margin-top:16px;
-}
-
-.subquestion-title{
-font-size:18px;
-font-weight:bold;
-color:#2F3443;
-margin-bottom:12px;
-}
-
-.sub-yesno{
-display:flex;
-gap:18px;
-flex-wrap:wrap;
-}
-
-.sub-yesno label{
-background:#f6f8fc;
-border:2px solid #dde2ee;
-padding:10px 16px;
-border-radius:14px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 768px){
 
 .question-title{
-font-size:20px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1E1B24;
+  margin: 0 0 24px;
+  text-align: center;
 }
 
-.question-text{
-font-size:16px;
+.question-description{
+  font-size: 17px;
+  line-height: 2;
+  color: #2B2B2B;
+  margin: 0 0 22px;
+  text-align: center;
 }
 
-.result-title{
-font-size:32px;
+.question-options{
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-bottom: 28px;
 }
 
-.result-text{
-font-size:20px;
+.questionnaire-nav{
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 34px;
 }
 
-.top-space{
-display:none;
-}
-
-.simple-top{
-justify-content:space-between;
-gap:10px;
-}
-
-.age-options,
-.gender-options,
-.yn-options,
-.sub-yesno{
-flex-direction:column;
-}
-
-.option-chip span,
-.yn-options label,
-.sub-yesno label{
-width:100%;
-text-align:center;
-}
+@media (max-width: 768px){
+  .question-title{
+    font-size: 20px;
+  }
+  .question-description{
+    font-size: 15px;
+  }
+  .question-progress{
+    font-size: 16px;
+  }
 }
 
 /* =========================
