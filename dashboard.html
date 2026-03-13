@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>مدد | متابعة التقدم</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.dashboard-page{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
+
+.dashboard-card{
+background:white;
+border-radius:20px;
+padding:40px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.dashboard-title{
+font-size:34px;
+font-weight:700;
+text-align:center;
+margin-bottom:10px;
+}
+
+.dashboard-sub{
+text-align:center;
+color:#666;
+margin-bottom:30px;
+font-size:18px;
+}
+
+.progress-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-top:20px;
+}
+
+.progress-box{
+background:#f7f9fc;
+padding:24px;
+border-radius:14px;
+text-align:center;
+}
+
+.progress-number{
+font-size:36px;
+font-weight:700;
+margin-top:10px;
+}
+
+.progress-label{
+font-size:16px;
+color:#777;
+}
+
+.dashboard-content{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:30px;
+margin-top:40px;
+}
+
+.chart-box{
+background:#f7f9fc;
+padding:20px;
+border-radius:14px;
+}
+
+.history-box{
+background:#f7f9fc;
+padding:20px;
+border-radius:14px;
+}
+
+.history-title{
+font-size:20px;
+font-weight:600;
+margin-bottom:12px;
+}
+
+.history-item{
+background:white;
+padding:12px 16px;
+border-radius:10px;
+margin-bottom:8px;
+display:flex;
+justify-content:space-between;
+}
+
+.top-logo{
+height:75px;
+display:block;
+margin:auto;
+margin-bottom:20px;
+}
+
+.back-btn{
+margin-top:30px;
+}
+
+</style>
+
+</head>
+
+<body class="bg-main" onload="loadDashboard()">
+
+<div class="bg-blur bg-blur-top"></div>
+<div class="bg-blur bg-blur-bottom"></div>
+
+<div class="dashboard-page">
+
+<img src="logo.png" class="top-logo">
+
+<div class="dashboard-card">
+
+<div class="dashboard-title">
+متابعة تطور الطفل
+</div>
+
+<div class="dashboard-sub">
+يمكنك متابعة تحسن أو تراجع المهارات عبر الوقت
+</div>
+
+<div class="progress-grid">
+
+<div class="progress-box">
+<div class="progress-label">آخر نتيجة</div>
+<div id="latestScore" class="progress-number">--</div>
+</div>
+
+<div class="progress-box">
+<div class="progress-label">مستوى الخطورة</div>
+<div id="latestRisk" class="progress-number">--</div>
+</div>
+
+<div class="progress-box">
+<div class="progress-label">اتجاه التقدم</div>
+<div id="progressTrend" class="progress-number">--</div>
+</div>
+
+<div class="progress-box">
+<div class="progress-label">عدد التقييمات</div>
+<div id="totalTests" class="progress-number">--</div>
+</div>
+
+</div>
+
+<div class="dashboard-content">
+
+<div class="chart-box">
+
+<div class="history-title">
+تطور النتيجة عبر الوقت
+</div>
+
+<canvas id="progressChart" height="120"></canvas>
+
+</div>
+
+<div class="history-box">
+
+<div class="history-title">
+السجل السابق
+</div>
+
+<div id="historyList"></div>
+
+</div>
+
+</div>
+
+<button class="main-btn back-btn" onclick="goBackHome()">
+العودة للرئيسية
+</button>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+function goBackHome(){
+window.location.href = "home.html"
+}
+
+function loadDashboard(){
+
+const assessment = JSON.parse(localStorage.getItem("maddadAssessment"))
+let history = JSON.parse(localStorage.getItem("maddadHistory")) || []
+
+if(!assessment){
+return
+}
+
+document.getElementById("latestScore").textContent = assessment.finalScore
+
+const riskText =
+assessment.finalRisk === "low" ? "منخفضة" :
+assessment.finalRisk === "medium" ? "متوسطة" :
+"مرتفعة"
+
+document.getElementById("latestRisk").textContent = riskText
+
+document.getElementById("totalTests").textContent = history.length
+
+let trend = "ثابت"
+
+if(history.length >= 2){
+
+const last = history[history.length-1].score
+const prev = history[history.length-2].score
+
+if(last < prev){
+trend = "تحسن"
+}
+else if(last > prev){
+trend = "تراجع"
+}
+
+}
+
+document.getElementById("progressTrend").textContent = trend
+
+const list = document.getElementById("historyList")
+
+list.innerHTML=""
+
+history.forEach(item => {
+
+const div = document.createElement("div")
+
+div.className="history-item"
+
+div.innerHTML = `
+<span>${item.date}</span>
+<span>${item.risk}</span>
+`
+
+list.appendChild(div)
+
+})
+
+let chartColor = "#4CAF50"
+
+if(assessment.finalRisk === "medium"){
+chartColor = "#FFC107"
+}
+
+if(assessment.finalRisk === "high"){
+chartColor = "#F44336"
+}
+
+const labels = history.map(h => h.date)
+const scores = history.map(h => h.score)
+
+if(labels.length > 0){
+
+const ctx = document.getElementById("progressChart")
+
+new Chart(ctx,{
+
+type:"line",
+
+data:{
+labels:labels,
+datasets:[{
+data:scores,
+borderColor:chartColor,
+backgroundColor:chartColor+"33",
+borderWidth:3,
+tension:0.4,
+pointRadius:5,
+fill:true
+}]
+},
+
+options:{
+plugins:{legend:{display:false}},
+scales:{
+y:{
+beginAtZero:true,
+ticks:{stepSize:1}
+}
+}
+}
+
+})
+
+}
+
+}
+
+</script>
+<script src="script.js"></script>
+</body>
+</html>
