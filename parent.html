@@ -6,7 +6,7 @@
   <title>مدد | تسجيل ولي الأمر</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .field-error { color: red !important; }
+    .field-error { color: red !important; font-size: 13px; display: block; margin-top: 4px; }
   </style>
 </head>
 <body class="bg-main">
@@ -60,6 +60,8 @@
 
       <!-- Signup Form -->
       <div id="signupBox" style="display:none;">
+
+        <!-- اسم الطفل -->
         <div class="form-group">
           <label>اسم الطفل</label>
           <input
@@ -76,6 +78,32 @@
           />
           <span class="field-error" id="signupNameError"></span>
         </div>
+
+        <!-- عمر الطفل -->
+        <div class="form-group">
+          <label>عمر الطفل</label>
+          <select id="signupAgeGroup" required>
+            <option value="" disabled selected>اختر الفئة العمرية</option>
+            <option value="12-18">12 - 18 شهر</option>
+            <option value="19-24">19 - 24 شهر</option>
+            <option value="25-30">25 - 30 شهر</option>
+            <option value="31-36">31 - 36 شهر</option>
+          </select>
+          <span class="field-error" id="signupAgeError"></span>
+        </div>
+
+        <!-- جنس الطفل -->
+        <div class="form-group">
+          <label>جنس الطفل</label>
+          <select id="signupGender" required>
+            <option value="" disabled selected>اختر الجنس</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+          </select>
+          <span class="field-error" id="signupGenderError"></span>
+        </div>
+
+        <!-- البريد الإلكتروني -->
         <div class="form-group">
           <label>البريد الإلكتروني</label>
           <input
@@ -91,6 +119,8 @@
           />
           <span class="field-error" id="signupEmailError"></span>
         </div>
+
+        <!-- كلمة المرور -->
         <div class="form-group">
           <label>كلمة المرور</label>
           <input
@@ -105,6 +135,7 @@
           />
           <span class="field-error" id="signupPasswordError"></span>
         </div>
+
         <button class="main-btn" onclick="submitSignup()">إنشاء الحساب</button>
         <p class="switch-text">
           عندك حساب؟
@@ -176,13 +207,13 @@
     }
 
     function submitLogin() {
-      const emailInput = document.getElementById("parentLoginEmail");
+      const emailInput    = document.getElementById("parentLoginEmail");
       const passwordInput = document.getElementById("parentLoginPassword");
 
       validateEmail(emailInput, "loginEmailError");
       validatePassword(passwordInput, "loginPasswordError");
 
-      const emailValid = !document.getElementById("loginEmailError").textContent;
+      const emailValid    = !document.getElementById("loginEmailError").textContent;
       const passwordValid = passwordInput.dataset.valid === "true";
 
       if (emailValid && passwordValid) {
@@ -191,19 +222,26 @@
     }
 
     function submitSignup() {
-      const nameInput = document.getElementById("signupChildName");
-      const emailInput = document.getElementById("signupEmail");
+      const nameInput     = document.getElementById("signupChildName");
+      const ageInput      = document.getElementById("signupAgeGroup");
+      const genderInput   = document.getElementById("signupGender");
+      const emailInput    = document.getElementById("signupEmail");
       const passwordInput = document.getElementById("signupPassword");
 
       validateName(nameInput, "signupNameError");
       validateEmail(emailInput, "signupEmailError");
       validatePassword(passwordInput, "signupPasswordError");
 
-      const nameValid = !document.getElementById("signupNameError").textContent;
-      const emailValid = !document.getElementById("signupEmailError").textContent;
+      document.getElementById("signupAgeError").textContent    = ageInput.value    ? "" : "يرجى اختيار عمر الطفل";
+      document.getElementById("signupGenderError").textContent  = genderInput.value ? "" : "يرجى اختيار جنس الطفل";
+
+      const nameValid     = !document.getElementById("signupNameError").textContent;
+      const ageValid      = !!ageInput.value;
+      const genderValid   = !!genderInput.value;
+      const emailValid    = !document.getElementById("signupEmailError").textContent;
       const passwordValid = passwordInput.dataset.valid === "true";
 
-      if (nameValid && emailValid && passwordValid) {
+      if (nameValid && ageValid && genderValid && emailValid && passwordValid) {
         parentSignup();
       }
     }
