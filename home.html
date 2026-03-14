@@ -11,52 +11,57 @@
   <div class="bg-blur bg-blur-bottom"></div>
 
   <div class="home-page">
-    <div class="top-bar">
-  <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
-</div>
 
-<div class="logo-center">
-  <img src="logo.png" class="top-logo" alt="شعار مدد" />
-</div>
-
-    <div class="home-card">
-      <h1 class="home-title" id="welcomeMessage">أهلًا ولي أمر الطفل</h1>
-      <p class="home-subtitle">
-        هنا يمكنك متابعة حالة طفلك والبدء في الاستبيان.
-      </p>
-
-      <div class="child-summary">
-        <h3>بيانات الطفل</h3>
-        <p><strong>اسم الطفل:</strong> <span id="childNameText">---</span></p>
-        <p><strong>الحساب:</strong> <span id="emailText">---</span></p>
+    <!-- الشريط الجانبي -->
+    <nav class="home-sidebar">
+      <div class="home-sidebar-logo">
+        <img src="logo.png" alt="شعار مدد" />
       </div>
 
-      <div class="home-actions">
-        <button class="main-btn big-btn" onclick="startQuestionnaire()">
-          ابدأ الاستبيان الآن
-        </button>
+      <div class="sidebar-divider"></div>
 
-        <br><br>
+      <a href="Account.html" class="home-sidebar-link">
+        <span class="sidebar-icon">👤</span>
+        حسابي
+      </a>
 
-       <button class="main-btn big-btn" onclick="window.location.href='games.html'">
-          الألعاب التدريبية
-        </button>
+      <a href="games.html" class="home-sidebar-link">
+        <span class="sidebar-icon">🌱</span>
+        مساحة نمو
+      </a>
 
-        <button class="main-btn big-btn" onclick="window.location.href='dashboard.html'">
-           متابعة التقدم
-        </button>
+      <a href="dashboard.html" class="home-sidebar-link">
+        <span class="sidebar-icon">📊</span>
+        متابعة التقدم
+      </a>
+    </nav>
 
-        <button class="main-btn big-btn" onclick="window.location.href='Account.html'">
-          حسابي
-        </button>
+    <!-- المحتوى الرئيسي -->
+    <div class="home-main">
+      <div class="top-bar">
+        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+      </div>
 
-        
+      <div class="home-card">
+        <h1 class="home-title" id="welcomeMessage">أهلًا ولي أمر الطفل</h1>
+        <p class="home-subtitle">
+          هنا يمكنك متابعة حالة طفلك والبدء في الاستبيان.
+        </p>
 
+        <div class="child-summary">
+          <h3>بيانات الطفل</h3>
+          <p><strong>اسم الطفل:</strong> <span id="childNameText">---</span></p>
+          <p><strong>الحساب:</strong> <span id="emailText">---</span></p>
+        </div>
 
-      
-        
+        <div class="home-actions">
+          <button class="main-btn big-btn" onclick="startQuestionnaire()">
+            ابدأ الاستبيان الآن
+          </button>
+        </div>
       </div>
     </div>
+
   </div>
 
   <script src="script.js"></script>
