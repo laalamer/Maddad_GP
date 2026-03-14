@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:Tahoma, Arial, sans-serif;
+  font-family:"Cairo", Tahoma, Arial, sans-serif;
 }
 
 body{
@@ -45,8 +47,7 @@ body{
 }
 
 .container,
-.auth-wrapper,
-.home-page{
+.auth-wrapper{
   position:relative;
   z-index:2;
   width:100%;
@@ -202,10 +203,31 @@ body{
   background:#fbfcff;
   outline:none;
   font-size:15px;
+  font-family:"Cairo", sans-serif;
   transition:0.2s;
 }
 
 .form-group input:focus{
+  border-color:#8da2c9;
+  box-shadow:0 0 0 4px rgba(141,162,201,0.15);
+}
+
+.form-group select{
+  width:100%;
+  padding:14px 16px;
+  border:1.8px solid #d8ddeb;
+  border-radius:14px;
+  background:#fbfcff;
+  outline:none;
+  font-size:15px;
+  font-family:"Cairo", sans-serif;
+  color:#2f3443;
+  transition:0.2s;
+  appearance:none;
+  cursor:pointer;
+}
+
+.form-group select:focus{
   border-color:#8da2c9;
   box-shadow:0 0 0 4px rgba(141,162,201,0.15);
 }
@@ -219,6 +241,7 @@ body{
   color:white;
   font-size:16px;
   font-weight:bold;
+  font-family:"Cairo", sans-serif;
   cursor:pointer;
   transition:0.25s;
   box-shadow:0 10px 20px rgba(141,162,201,0.22);
@@ -258,15 +281,96 @@ body{
   font-weight:bold;
 }
 
-/* Home Page */
+/* ===========================
+   HOME PAGE — Sidebar Layout
+=========================== */
+
 .home-page{
-  max-width:900px;
+  display:flex;
+  align-items:flex-start;
+  gap:0;
+  width:100%;
+  max-width:1100px;
+  min-height:100vh;
   margin:auto;
+  position:relative;
+  z-index:2;
+  padding:30px 16px;
 }
+
+/* LEFT SIDEBAR */
+.home-sidebar{
+  width:190px;
+  min-width:190px;
+  background:rgba(255,255,255,0.93);
+  border-radius:24px;
+  padding:28px 12px;
+  box-shadow:0 10px 30px rgba(58,67,92,0.10);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-self:flex-start;
+  position:sticky;
+  top:30px;
+}
+
+.home-sidebar-logo{
+  display:flex;
+  justify-content:center;
+  margin-bottom:22px;
+}
+
+.home-sidebar-logo img{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:white;
+  padding:12px;
+  object-fit:contain;
+  box-shadow:0 8px 22px rgba(0,0,0,0.12);
+}
+
+.home-sidebar-link{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#2f3443;
+  font-size:15px;
+  font-weight:700;
+  font-family:"Cairo", sans-serif;
+  padding:13px 14px;
+  border-radius:14px;
+  transition:0.2s;
+  background:transparent;
+}
+
+.home-sidebar-link:hover{
+  background:linear-gradient(135deg, rgba(141,162,201,0.18), rgba(216,168,184,0.18));
+  color:#3559A8;
+}
+
+.home-sidebar-link .sidebar-icon{
+  font-size:20px;
+}
+
+.sidebar-divider{
+  height:1px;
+  background:rgba(141,162,201,0.2);
+  margin:6px 0;
+}
+
+/* MAIN CONTENT AREA */
+.home-main{
+  flex:1;
+  padding:0 20px;
+  min-width:0;
+}
+
 .top-bar{
   display:flex;
   justify-content:flex-start;
-  margin-bottom:10px;
+  margin-bottom:14px;
 }
 
 .logo-center{
@@ -276,11 +380,11 @@ body{
 }
 
 .top-logo{
-  width:120px;
-  height:120px;
+  width:110px;
+  height:110px;
   border-radius:50%;
   background:white;
-  padding:18px;
+  padding:16px;
   object-fit:contain;
   box-shadow:0 10px 25px rgba(0,0,0,0.12);
 }
@@ -293,7 +397,13 @@ body{
   border-radius:12px;
   cursor:pointer;
   font-weight:bold;
+  font-family:"Cairo", sans-serif;
   box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  transition:0.2s;
+}
+
+.logout-btn:hover{
+  background:#f0f4ff;
 }
 
 .home-card{
@@ -304,9 +414,10 @@ body{
 }
 
 .home-title{
-  font-size:34px;
+  font-size:32px;
   color:#2f3443;
   margin-bottom:12px;
+  font-weight:800;
 }
 
 .home-subtitle{
@@ -326,7 +437,8 @@ body{
 .child-summary h3{
   color:#2f3443;
   margin-bottom:14px;
-  font-size:22px;
+  font-size:20px;
+  font-weight:700;
 }
 
 .child-summary p{
@@ -336,7 +448,7 @@ body{
 }
 
 .big-btn{
-  max-width:320px;
+  max-width:360px;
 }
 
 .home-actions{
@@ -345,21 +457,68 @@ body{
 }
 
 /* Responsive */
+@media (max-width:900px){
+  .home-page{
+    flex-direction:column;
+    padding:16px 12px;
+  }
+
+  .home-sidebar{
+    width:100%;
+    min-width:auto;
+    flex-direction:row;
+    flex-wrap:wrap;
+    position:static;
+    padding:14px 12px;
+    gap:6px;
+  }
+
+  .home-sidebar-logo{
+    display:none;
+  }
+
+  .home-sidebar-link{
+    font-size:14px;
+    padding:10px 12px;
+  }
+
+  .sidebar-divider{
+    display:none;
+  }
+
+  .home-main{
+    padding:0;
+  }
+
+  .home-card{
+    padding:24px;
+  }
+
+  .home-title{
+    font-size:26px;
+  }
+
+  .home-subtitle{
+    font-size:16px;
+  }
+
+  .big-btn{
+    max-width:100%;
+  }
+}
+
 @media (max-width:768px){
   .container,
-  .home-card,
   .auth-card{
     padding:24px;
   }
 
   .welcome-title,
-  .home-title,
   .auth-title{
     font-size:28px;
   }
 
-  .welcome-text,
-  .home-subtitle{
+  .welcome-text{
     font-size:17px;
   }
 
@@ -370,22 +529,11 @@ body{
   .role-card{
     flex-direction:row;
   }
-
-  .top-bar{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .big-btn{
-    max-width:100%;
-  }
 }
 
 /* =========================
    QUESTIONNAIRE 
 ========================= */
-
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
 
 .questionnaire-page-body,
 .questionnaire-page-body *{
@@ -439,7 +587,6 @@ body{
   object-fit: contain;
   display: block;
 }
-
 
 .questionnaire-main{
   max-width: 920px;
@@ -518,12 +665,16 @@ body{
 
 .questionnaire-next-wrap{
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  align-items: center;
+  gap: 16px;
   margin-top: 34px;
+  direction: ltr;
 }
 
 .questionnaire-next-btn{
-  min-width: 160px;
+  width: 160px;
   height: 54px;
   border: none;
   border-radius: 999px;
@@ -533,6 +684,17 @@ body{
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
+  transition: 0.2s ease;
+  flex-shrink: 0;
+}
+
+.questionnaire-next-btn:hover{
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.questionnaire-next-btn.prev-btn{
+  background: #AAB9D3;
 }
 
 .questionnaire-error{
@@ -572,7 +734,7 @@ body{
   }
 
   .questionnaire-next-btn{
-    min-width: 140px;
+    min-width: 130px;
     height: 50px;
     font-size: 17px;
   }
@@ -586,58 +748,57 @@ body{
   }
 }
 
-
 /* =========================
    RESULT PAGE
 ========================= */
 
 .result-page{
-width:100%;
-max-width:1000px;
-margin:auto;
-padding:30px 20px 50px;
+  width:100%;
+  max-width:1000px;
+  margin:auto;
+  padding:30px 20px 50px;
 }
 
 .result-card{
-background:white;
-border-radius:32px;
-padding:45px 35px;
-box-shadow:0 14px 35px rgba(0,0,0,0.08);
-text-align:center;
+  background:white;
+  border-radius:32px;
+  padding:45px 35px;
+  box-shadow:0 14px 35px rgba(0,0,0,0.08);
+  text-align:center;
 }
 
 .result-badge{
-display:inline-block;
-padding:10px 18px;
-border-radius:999px;
-font-size:15px;
-font-weight:bold;
-margin-bottom:20px;
+  display:inline-block;
+  padding:10px 18px;
+  border-radius:999px;
+  font-size:15px;
+  font-weight:bold;
+  margin-bottom:20px;
 }
 
 .result-title{
-font-size:44px;
-color:#2F3443;
-margin-bottom:14px;
+  font-size:44px;
+  color:#2F3443;
+  margin-bottom:14px;
 }
 
 .result-text{
-font-size:24px;
-line-height:1.9;
-color:#5a6478;
-max-width:800px;
-margin:0 auto 24px;
+  font-size:24px;
+  line-height:1.9;
+  color:#5a6478;
+  max-width:800px;
+  margin:0 auto 24px;
 }
 
 .result-summary{
-background:#f7f8fc;
-border-radius:20px;
-padding:22px;
-font-size:18px;
-line-height:2;
-color:#4d5668;
-margin-bottom:25px;
-text-align:right;
+  background:#f7f8fc;
+  border-radius:20px;
+  padding:22px;
+  font-size:18px;
+  line-height:2;
+  color:#4d5668;
+  margin-bottom:25px;
+  text-align:right;
 }
 
 /* =========================
@@ -677,9 +838,12 @@ text-align:right;
 
 .questionnaire-nav{
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  align-items: center;
   gap: 16px;
   margin-top: 34px;
+  direction: ltr;
 }
 
 @media (max-width: 768px){
@@ -903,6 +1067,7 @@ text-align:right;
   padding:14px 30px;
   font-size:18px;
   font-weight:bold;
+  font-family:"Cairo", sans-serif;
   cursor:pointer;
   box-shadow:0 8px 18px rgba(111, 86, 179, 0.22);
 }
@@ -1022,24 +1187,25 @@ text-align:right;
 }
 
 .page-title{
-    text-align:center;
-    font-size:32px;
-    font-weight:bold;
-    margin-top:40px;
-    margin-bottom:20px;
+  text-align:center;
+  font-size:32px;
+  font-weight:bold;
+  margin-top:40px;
+  margin-bottom:20px;
 }
 
 .back-home{
-    text-align: center;
-    margin-top: 100px;
-    margin-bottom: 80px;
+  text-align: center;
+  margin-top: 100px;
+  margin-bottom: 80px;
 }
 
 .back-btn{
-    background:#5b5bd6;
-    color:white;
-    padding:10px 25px;
-    border-radius:20px;
-    text-decoration:none;
-    font-size:16px;
+  background:#5b5bd6;
+  color:white;
+  padding:10px 25px;
+  border-radius:20px;
+  text-decoration:none;
+  font-size:16px;
+  font-family:"Cairo", sans-serif;
 }
